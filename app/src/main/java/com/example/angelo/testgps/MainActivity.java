@@ -2,13 +2,17 @@ package com.example.angelo.testgps;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,8 +20,13 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements LocationListener {
 
-    LocationManager locationManager;
-    TextView kmh;
+    private LocationManager locationManager;
+    private NotificationManager notificationManager;
+    private TextView kmh;
+    private Location lastLocation;
+    private Long lastTime;
+    private NotificationCompat.Builder mBuilder;
+    private static final int NOTIFY_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +34,24 @@ public class MainActivity extends Activity implements LocationListener {
         setContentView(R.layout.activity_main);
 
         kmh = (TextView)findViewById(R.id.kmh);
+        lastLocation = null;
+        lastTime = null;
+        mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.poke_speed)
+                .setContentTitle("Pokespeed")
+                .setOngoing(true);
+
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        mBuilder.setContentIntent(resultPendingIntent);
+
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         getPermissions();
         requestLocation();
     }
@@ -55,23 +81,45 @@ public class MainActivity extends Activity implements LocationListener {
     protected void onResume() {
         super.onResume();
         requestLocation();
+        notificationManager.notify(this.NOTIFY_ID, mBuilder.build());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         removeLocation();
+        notificationManager.cancelAll();
     }
 
     @Override
     public void onLocationChanged(Location location) {
         if(location.hasSpeed()) {
-            float speed = location.getSpeed(); // m/s
+            Float speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
-            kmh.setText(new Float(speed).toString());
+            //kmh.setText(speed.toString());
+            setKm(speed);
         }
-        else
-            kmh.setText("No speed");
+        else if(this.lastLocation == null || this.lastTime == null) {
+            this.lastLocation = location;
+            this.lastTime = location.getTime(); // ms
+        }
+        else {
+            float distanceCovered = location.distanceTo(this.lastLocation); // m
+            long timeElapsed = location.getTime() - this.lastTime; //ms
+            this.lastLocation = location;
+            this.lastTime = location.getTime();
+            Float speed = distanceCovered / timeElapsed; // m/ms
+            speed = speed * 60 * 60 * 60 / 1000; // km/h
+            //kmh.setText(speed.toString());
+            setKm(speed);
+        }
+    }
+
+    private void setKm(Float speed) {
+        String speedStr = speed.toString();
+        kmh.setText(speedStr);
+        mBuilder.setContentText(speedStr);
+        notificationManager.notify(this.NOTIFY_ID, mBuilder.build());
     }
 
     @Override
