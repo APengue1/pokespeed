@@ -9,21 +9,93 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 
-public class SpeedService extends Service implements LocationListener {
+public class SpeedService extends Service {
 
-    private LocationManager locationManager;
-    private Location lastLocation;
-    private Long lastTime;
-    private static final int NOTIFY_ID = 1;
+    private final class speedRunnable implements Runnable, LocationListener {
+
+        private LocationManager locationManager;
+        private Location lastLocation;
+        private Long lastTime;
+        private static final int NOTIFY_ID = 1;
+
+        @Override
+        public void run() {
+
+        }
+
+        private void requestLocation() {
+            try {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        500l,
+                        0.5f,
+                        this);
+            }
+            catch(SecurityException e) {
+                //kmh.setText(e.getMessage());
+            }
+        }
+
+        private void removeLocation() {
+            try {
+                locationManager.removeUpdates(this);
+            }
+            catch(SecurityException e) {
+                // kmh.setText(e.getMessage());
+            }
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            if(location.hasSpeed()) {
+                Float speed = location.getSpeed(); // m/s
+                speed = speed * 60 * 60 / 1000; // km/h
+                //kmh.setText(speed.toString());
+                setSpeed(speed);
+            }
+            else if(this.lastLocation == null || this.lastTime == null) {
+                this.lastLocation = location;
+                this.lastTime = location.getTime(); // ms
+            }
+            else {
+                float distanceCovered = location.distanceTo(this.lastLocation); // m
+                long timeElapsed = location.getTime() - this.lastTime; //ms
+                this.lastLocation = location;
+                this.lastTime = location.getTime();
+                Float speed = distanceCovered / timeElapsed; // m/ms
+                speed = speed * 60 * 60 * 60 / 1000; // km/h
+                //kmh.setText(speed.toString());
+                setSpeed(speed);
+            }
+        }
+
+        private void setSpeed(Float speed) {
+            String speedStr = speed.toString();
+//        kmh.setText(speedStr);
+//        mBuilder.setContentText(speedStr);
+//        notificationManager.notify(this.NOTIFY_ID, mBuilder.build());
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    }
 
     public SpeedService() {
     }
 
     @Override
     public void onCreate() {
-        lastLocation = null;
-        lastTime = null;
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         super.onCreate();
     }
 
@@ -44,70 +116,4 @@ public class SpeedService extends Service implements LocationListener {
         return null;
     }
 
-    private void requestLocation() {
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    500l,
-                    0.5f,
-                    this);
-        }
-        catch(SecurityException e) {
-            //kmh.setText(e.getMessage());
-        }
-    }
-
-    private void removeLocation() {
-        try {
-            locationManager.removeUpdates(this);
-        }
-        catch(SecurityException e) {
-           // kmh.setText(e.getMessage());
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if(location.hasSpeed()) {
-            Float speed = location.getSpeed(); // m/s
-            speed = speed * 60 * 60 / 1000; // km/h
-            //kmh.setText(speed.toString());
-            setKm(speed);
-        }
-        else if(this.lastLocation == null || this.lastTime == null) {
-            this.lastLocation = location;
-            this.lastTime = location.getTime(); // ms
-        }
-        else {
-            float distanceCovered = location.distanceTo(this.lastLocation); // m
-            long timeElapsed = location.getTime() - this.lastTime; //ms
-            this.lastLocation = location;
-            this.lastTime = location.getTime();
-            Float speed = distanceCovered / timeElapsed; // m/ms
-            speed = speed * 60 * 60 * 60 / 1000; // km/h
-            //kmh.setText(speed.toString());
-            setKm(speed);
-        }
-    }
-
-    private void setKm(Float speed) {
-        String speedStr = speed.toString();
-//        kmh.setText(speedStr);
-//        mBuilder.setContentText(speedStr);
-//        notificationManager.notify(this.NOTIFY_ID, mBuilder.build());
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 }
