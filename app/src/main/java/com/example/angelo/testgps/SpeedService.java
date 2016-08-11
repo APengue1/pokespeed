@@ -11,12 +11,19 @@ import android.os.IBinder;
 
 public class SpeedService extends Service {
 
-    private final class speedRunnable implements Runnable, LocationListener {
+    Runnable speedRunnable;
+    Thread speedThread;
+
+    private final class SpeedRunnable implements Runnable, LocationListener {
 
         private LocationManager locationManager;
         private Location lastLocation;
         private Long lastTime;
         private static final int NOTIFY_ID = 1;
+
+        public SpeedRunnable() {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
 
         @Override
         public void run() {
@@ -26,8 +33,8 @@ public class SpeedService extends Service {
         private void requestLocation() {
             try {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                        500l,
-                        0.5f,
+                        500L,
+                        0.5F,
                         this);
             }
             catch(SecurityException e) {
@@ -96,6 +103,9 @@ public class SpeedService extends Service {
 
     @Override
     public void onCreate() {
+        speedRunnable = new SpeedRunnable();
+        speedThread = new Thread(speedRunnable);
+
         super.onCreate();
     }
 
