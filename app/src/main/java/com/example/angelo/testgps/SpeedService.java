@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -41,7 +42,7 @@ public class SpeedService extends Service implements LocationListener{
     private void initNotification() {
         mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.poke_speed)
-                .setContentTitle("Pokespeed");
+                .setContentTitle("Pokespeed").setColor(Color.GREEN);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
@@ -121,7 +122,13 @@ public class SpeedService extends Service implements LocationListener{
 
     private void setSpeed(Float speed) {
         Integer speedInt = Math.round(speed);
+        int argb = Color.GREEN;
+        if(speedInt > 14)
+            argb= Color.YELLOW;
+        else if(speedInt > 17)
+            argb = Color.RED;
         mBuilder.setContentTitle(speedInt.toString());
+        mBuilder.setColor(argb);
         startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
