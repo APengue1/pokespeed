@@ -2,19 +2,10 @@ package com.example.angelo.testgps;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -29,7 +20,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         kmh = (TextView)findViewById(R.id.kmh);
         getPermissions();
-
+        startService(new Intent(this, SpeedService.class));
     }
 
     @Override
