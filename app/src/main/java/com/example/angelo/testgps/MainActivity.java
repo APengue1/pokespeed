@@ -20,11 +20,11 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         kmh = (TextView)findViewById(R.id.kmh);
         getPermissions();
-        startService(new Intent(this, SpeedService.class));
     }
 
     @Override
     protected void onResume() {
+        getPermissions();
         super.onResume();
     }
 
@@ -38,6 +38,10 @@ public class MainActivity extends Activity {
         kmh.setText(speedStr);
     }
 
+    private void startSpeedService() {
+        startService(new Intent(this, SpeedService.class));
+    }
+
     private void getPermissions() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
@@ -46,16 +50,22 @@ public class MainActivity extends Activity {
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    1616);
+                    1);
 
             // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
             // app-defined int constant. The callback method gets the
             // result of the request.
             }
+        else {
+            startSpeedService();
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults.length > 0 && grantResults[0] != -1)
+            startSpeedService();
+
     }
 }

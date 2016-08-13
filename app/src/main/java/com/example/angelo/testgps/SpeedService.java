@@ -30,7 +30,8 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent.getAction().compareTo(SpeedService.STOP_SERVICE_ACTION) == 0) {
+        if(intent.getAction() != null &&
+                intent.getAction().compareTo(SpeedService.STOP_SERVICE_ACTION) == 0) {
             stopForeground(true);
             stopSelf();
         }
