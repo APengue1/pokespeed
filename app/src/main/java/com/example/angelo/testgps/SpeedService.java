@@ -11,6 +11,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.NotificationCompat.WearableExtender;
+
 
 public class SpeedService extends Service implements LocationListener{
 
@@ -20,10 +23,15 @@ public class SpeedService extends Service implements LocationListener{
     private LocationManager locationManager;
     private Location lastLocation;
     private Long lastTime;
+    private NotificationManagerCompat notificationManager;
+    private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
+    private static final long[] VIBRATE_RED = new long[]{500, 500};
+    private static final long[] VIBRATE_GREEN = new long[]{};
 
     @Override
     public void onCreate() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        notificationManager = NotificationManagerCompat.from(this);
         initNotification();
         requestLocation();
         super.onCreate();
@@ -40,17 +48,12 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void initNotification() {
-        mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.poke_speed)
-                .setContentTitle("Pokespeed").setColor(Color.GREEN);
-
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
                 this,
                 0,
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
 
         Intent stopIntent = new Intent(this, SpeedService.class);
         stopIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
@@ -60,7 +63,11 @@ public class SpeedService extends Service implements LocationListener{
                 stopIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT
         );
-        mBuilder.addAction(android.R.drawable.ic_media_pause, "Stop", resultStopIntent);
+        mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.poke_speed)
+                .setContentTitle("Pokespeed")
+                .addAction(android.R.drawable.ic_media_pause, "Stop", resultStopIntent)
+                .setContentIntent(resultPendingIntent);
         startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
@@ -122,14 +129,23 @@ public class SpeedService extends Service implements LocationListener{
 
     private void setSpeed(Float speed) {
         Integer speedInt = Math.round(speed);
-        int argb = Color.GREEN;
-        if(speedInt > 14)
-            argb= Color.YELLOW;
-        else if(speedInt > 17)
+        int argb;
+        if(speedInt > 17) {
             argb = Color.RED;
+            mBuilder.setVibrate(SpeedService.VIBRATE_RED);
+        }
+        else if(speedInt > 14) {
+            argb = Color.YELLOW;
+            mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
+        }
+        else {
+            argb = Color.GREEN;
+            mBuilder.setVibrate(SpeedService.VIBRATE_GREEN);
+        }
         mBuilder.setContentTitle(speedInt.toString());
         mBuilder.setColor(argb);
-        startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
+        //startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
+        notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
     @Override
