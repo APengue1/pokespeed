@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.NotificationCompat.WearableExtender;
 
 
 public class SpeedService extends Service implements LocationListener{
@@ -26,7 +25,6 @@ public class SpeedService extends Service implements LocationListener{
     private NotificationManagerCompat notificationManager;
     private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
     private static final long[] VIBRATE_RED = new long[]{500, 500};
-    private static final long[] VIBRATE_GREEN = new long[]{};
 
     @Override
     public void onCreate() {
@@ -140,7 +138,7 @@ public class SpeedService extends Service implements LocationListener{
         }
         else {
             argb = Color.GREEN;
-            mBuilder.setVibrate(SpeedService.VIBRATE_GREEN);
+            mBuilder.setVibrate(null);
         }
         mBuilder.setContentTitle(speedInt.toString());
         mBuilder.setColor(argb);
