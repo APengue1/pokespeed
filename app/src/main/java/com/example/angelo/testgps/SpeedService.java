@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -17,14 +18,16 @@ import android.support.v4.app.NotificationManagerCompat;
 public class SpeedService extends Service implements LocationListener{
 
     private NotificationCompat.Builder mBuilder;
-    private static final int NOTIFY_ID = 1;
-    private static final String STOP_SERVICE_ACTION = "Stop Service Action";
+
     private LocationManager locationManager;
     private Location lastLocation;
     private Long lastTime;
     private NotificationManagerCompat notificationManager;
     private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
     private static final long[] VIBRATE_RED = new long[]{500, 500};
+    private static final int NOTIFY_ID = 1;
+    private static final String STOP_SERVICE_ACTION = "Stop Service Action";
+    private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onCreate() {
@@ -33,6 +36,21 @@ public class SpeedService extends Service implements LocationListener{
         initNotification();
         requestLocation();
         super.onCreate();
+    }
+
+    public int test() {
+        return 5000;
+    }
+
+    public class LocalBinder extends Binder {
+        SpeedService getService() {
+            return SpeedService.this;
+        }
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
     }
 
     @Override
@@ -150,11 +168,6 @@ public class SpeedService extends Service implements LocationListener{
     public void onDestroy() {
         removeLocation();
         super.onDestroy();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 
 }
