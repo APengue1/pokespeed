@@ -64,7 +64,7 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.poke_speed)
                 .setContentTitle("Pokespeed")
-                .addAction(android.R.drawable.ic_media_pause, "Stop", resultStopIntent)
+                //.addAction(android.R.drawable.ic_media_pause, "Stop", resultStopIntent)
                 .setContentIntent(resultPendingIntent);
         startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
     }

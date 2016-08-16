@@ -7,25 +7,33 @@ import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.ToggleButton;
 
 public class MainActivity extends Activity {
 
-
-    private TextView kmh;
+    private ToggleButton speedToggle;
+    private static boolean toggledOff = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        kmh = (TextView)findViewById(R.id.kmh);
-        getPermissions();
+        speedToggle = (ToggleButton)findViewById(R.id.toggleSpeedService);
+        speedToggle.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(toggledOff)
+                    startSpeedService();
+                else
+                    stopSpeedService();
+            }
+        });
     }
 
     @Override
     protected void onResume() {
-        getPermissions();
         super.onResume();
+        speedToggle.setChecked(!toggledOff);
     }
 
     @Override
@@ -33,16 +41,12 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
-    private void setKm(Float speed) {
-        String speedStr = speed.toString();
-        kmh.setText(speedStr);
+    private void stopSpeedService() {
+        stopService(new Intent(this, SpeedService.class));
+        toggledOff = true;
     }
 
     private void startSpeedService() {
-        startService(new Intent(this, SpeedService.class));
-    }
-
-    private void getPermissions() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -57,15 +61,21 @@ public class MainActivity extends Activity {
             // result of the request.
             }
         else {
-            startSpeedService();
+            _startSpeedService();
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length > 0 && grantResults[0] != -1)
-            startSpeedService();
+        if(grantResults.length > 0 && grantResults[0] != -1) {
+            _startSpeedService();
+        }
 
+    }
+
+    private void _startSpeedService() {
+        startService(new Intent(this, SpeedService.class));
+        toggledOff = false;
     }
 }

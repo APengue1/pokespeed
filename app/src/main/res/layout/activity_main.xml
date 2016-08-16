@@ -9,12 +9,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.angelo.testgps.MainActivity">
 
-    <TextView
+    <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="None"
-        android:id="@+id/kmh"
+        android:id="@+id/toggleSpeedService"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:checked="false" />
 </RelativeLayout>
