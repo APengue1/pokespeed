@@ -27,7 +27,6 @@ public class PokeSpeedStats {
             double distance = lastLocation.distanceTo(location) / 1000;
             distanceCovered += distance;
             if(speed != null) {
-                speed = speed * 60 * 60 / 1000;
                 speedTotal += speed;
                 if(speed > maxSpeed)
                     maxSpeed = speed;
