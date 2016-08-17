@@ -50,11 +50,11 @@ public class MainActivity extends Activity {
                     TextView averageSpeed = (TextView)findViewById(R.id.averageSpeed);
                     TextView maxSpeed = (TextView)findViewById(R.id.maxSpeed);
 
-                    distanceValid.setText(new Double(statsValues[0]).toString());
-                    distanceCovered.setText(new Double(statsValues[1]).toString());
-                    percentDistance.setText(new Double(statsValues[2]).toString());
-                    averageSpeed.setText(new Double(statsValues[3]).toString());
-                    maxSpeed.setText(new Double(statsValues[4]).toString());
+                    distanceValid.setText(new Double(Math.round(statsValues[0])).toString());
+                    distanceCovered.setText(new Double(Math.round(statsValues[1])).toString());
+                    percentDistance.setText(new Double(Math.round(statsValues[2])).toString());
+                    averageSpeed.setText(new Double(Math.round(statsValues[3])).toString());
+                    maxSpeed.setText(new Double(Math.round(statsValues[4])).toString());
                 }
             }
         });

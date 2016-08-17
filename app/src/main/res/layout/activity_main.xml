@@ -85,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Total DIstance"
+            android:text="Total Distance"
             android:id="@+id/textView2"
             android:layout_gravity="center_horizontal" />
 
@@ -93,7 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="% DIstance Valid"
+            android:text="% Distance Valid"
             android:id="@+id/textView3"
             android:layout_gravity="center_horizontal" />
 
