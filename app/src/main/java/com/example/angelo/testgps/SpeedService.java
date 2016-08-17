@@ -17,8 +17,9 @@ import android.support.v4.app.NotificationManagerCompat;
 
 public class SpeedService extends Service implements LocationListener{
 
-    private NotificationCompat.Builder mBuilder;
+    static final int SPEED_RED = 17, SPEED_YELLOW = 14;
 
+    private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
     private Location lastLocation;
     private Long lastTime;
@@ -28,6 +29,7 @@ public class SpeedService extends Service implements LocationListener{
     private static final int NOTIFY_ID = 1;
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
     private final IBinder mBinder = new LocalBinder();
+    private static final PokeSpeedStats STATS = new PokeSpeedStats();
 
     @Override
     public void onCreate() {
@@ -38,14 +40,14 @@ public class SpeedService extends Service implements LocationListener{
         super.onCreate();
     }
 
-    public int test() {
-        return 5000;
-    }
-
     public class LocalBinder extends Binder {
         SpeedService getService() {
             return SpeedService.this;
         }
+    }
+
+    public PokeSpeedStats getStatsObj() {
+        return STATS;
     }
 
     @Override
@@ -108,8 +110,9 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
+        Float speed = null;
         if(location.hasSpeed()) {
-            Float speed = location.getSpeed(); // m/s
+            speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
         }
@@ -122,10 +125,11 @@ public class SpeedService extends Service implements LocationListener{
             long timeElapsed = location.getTime() - this.lastTime; //ms
             this.lastLocation = location;
             this.lastTime = location.getTime();
-            Float speed = distanceCovered / timeElapsed; // m/ms
+            speed = distanceCovered / timeElapsed; // m/ms
             speed = speed * 60 * 60 * 60 / 1000; // km/h
             setSpeed(speed);
         }
+        STATS.giveLocation(location, speed);
     }
 
     @Override
@@ -146,11 +150,11 @@ public class SpeedService extends Service implements LocationListener{
     private void setSpeed(Float speed) {
         Integer speedInt = Math.round(speed);
         int argb;
-        if(speedInt > 17) {
+        if(speedInt > SPEED_RED) {
             argb = Color.RED;
             mBuilder.setVibrate(SpeedService.VIBRATE_RED);
         }
-        else if(speedInt > 14) {
+        else if(speedInt > SPEED_YELLOW) {
             argb = Color.YELLOW;
             mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
         }
@@ -160,7 +164,6 @@ public class SpeedService extends Service implements LocationListener{
         }
         mBuilder.setContentTitle(speedInt.toString());
         mBuilder.setColor(argb);
-        //startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
