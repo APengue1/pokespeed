@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class MainActivity extends Activity {
@@ -21,7 +23,7 @@ public class MainActivity extends Activity {
     private ToggleButton speedToggle;
     private Button btn_stats;
     private static boolean toggledOff = true;
-    private static boolean mBound = false;
+    private boolean mBound = false;
     private SpeedService speedService;
     public static PokeSpeedStats stats;
 
@@ -64,29 +66,30 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         speedToggle.setChecked(!toggledOff);
-        if(!toggledOff && !MainActivity.mBound)
+        if(!toggledOff)
             _bindService();
-        //speedService.test();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //int t = speedService.test();
+        _unbindService();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (MainActivity.mBound) {
-            _unbindService();
-        }
+        _unbindService();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        _unbindService();
     }
 
     private void stopSpeedService() {
-        if(MainActivity.mBound) {
-            _unbindService();
-        }
+        _unbindService();
         stopService(new Intent(this, SpeedService.class));
         toggledOff = true;
     }
@@ -116,13 +119,17 @@ public class MainActivity extends Activity {
     }
 
     private void _bindService() {
-        bindService(new Intent(this, SpeedService.class), this.mConnection, Context.BIND_AUTO_CREATE);
-        MainActivity.mBound = true;
+        if(!mBound) {
+            bindService(new Intent(this, SpeedService.class), this.mConnection, Context.BIND_AUTO_CREATE);
+            mBound = true;
+        }
     }
 
     private void _unbindService() {
-        unbindService(this.mConnection);
-        MainActivity.mBound = false;
+        if(mBound) {
+            unbindService(this.mConnection);
+            mBound = false;
+        }
     }
 
     private void _startSpeedService() {
@@ -134,15 +141,14 @@ public class MainActivity extends Activity {
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
-            SpeedService.LocalBinder binder = (SpeedService.LocalBinder) service;
-            speedService = binder.getService();
+            speedService = ((SpeedService.LocalBinder) service).getService();
             stats = speedService.getStatsObj();
-            MainActivity.mBound = true;
+            mBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            MainActivity.mBound = false;
+            mBound = false;
             speedService = null;
         }
     };
