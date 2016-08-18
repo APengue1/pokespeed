@@ -75,12 +75,12 @@ public class SpeedService extends Service implements LocationListener{
 
         Intent stopIntent = new Intent(this, SpeedService.class);
         stopIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
-        PendingIntent resultStopIntent= PendingIntent.getService(
-                this,
-                0,
-                stopIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT
-        );
+//        PendingIntent resultStopIntent= PendingIntent.getService(
+//                this,
+//                0,
+//                stopIntent,
+//                PendingIntent.FLAG_CANCEL_CURRENT
+//        );
         mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.poke_speed)
                 .setContentTitle("Pokespeed")
@@ -110,26 +110,29 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        Float speed = null;
-        if(location.hasSpeed()) {
-            speed = location.getSpeed(); // m/s
-            speed = speed * 60 * 60 / 1000; // km/h
-            setSpeed(speed);
-        }
-        else if(this.lastLocation == null || this.lastTime == null) {
-            this.lastLocation = location;
-            this.lastTime = location.getTime(); // ms
+        if(location.getAccuracy() <= 5) {
+            Float speed = null;
+            if (location.hasSpeed()) {
+                speed = location.getSpeed(); // m/s
+                speed = speed * 60 * 60 / 1000; // km/h
+                setSpeed(speed);
+            } else if (this.lastLocation == null || this.lastTime == null) {
+                this.lastLocation = location;
+                this.lastTime = location.getTime(); // ms
+            } else {
+                float distanceCovered = location.distanceTo(this.lastLocation); // m
+                long timeElapsed = location.getTime() - this.lastTime; //ms
+                this.lastLocation = location;
+                this.lastTime = location.getTime();
+                speed = distanceCovered / timeElapsed; // m/ms
+                speed = speed * 60 * 60 * 60 / 1000; // km/h
+                setSpeed(speed);
+            }
+            STATS.giveLocation(location, speed);
         }
         else {
-            float distanceCovered = location.distanceTo(this.lastLocation); // m
-            long timeElapsed = location.getTime() - this.lastTime; //ms
-            this.lastLocation = location;
-            this.lastTime = location.getTime();
-            speed = distanceCovered / timeElapsed; // m/ms
-            speed = speed * 60 * 60 * 60 / 1000; // km/h
-            setSpeed(speed);
+            setInaccurate();
         }
-        STATS.giveLocation(location, speed);
     }
 
     @Override
@@ -145,6 +148,13 @@ public class SpeedService extends Service implements LocationListener{
     @Override
     public void onProviderDisabled(String s) {
 
+    }
+
+    private void setInaccurate() {
+        mBuilder.setVibrate(null);
+        mBuilder.setContentTitle("Waiting for accurate location...");
+        mBuilder.setColor(Color.TRANSPARENT);
+        notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
     private void setSpeed(Float speed) {
