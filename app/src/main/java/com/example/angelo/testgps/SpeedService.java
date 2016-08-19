@@ -66,14 +66,14 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void initNotification() {
-        Intent resultIntent = new Intent(this, MainActivity.class);
+        Intent resultIntent = new Intent(this, Main2Activity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(
                 this,
                 0,
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent stopIntent = new Intent(this, MainActivity.class);
+        Intent stopIntent = new Intent(this, Main2Activity.class);
         stopIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
         PendingIntent resultStopIntent= PendingIntent.getService(
                 this,

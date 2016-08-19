@@ -82,8 +82,8 @@ public class Main2Activity extends AppCompatActivity
                     TextView averageSpeed = (TextView)findViewById(R.id.averageSpeed);
                     TextView maxSpeed = (TextView)findViewById(R.id.maxSpeed);
 
-                    distanceValid.setText(String.format("%.1f", Double.valueOf(statsValues[0])));
-                    distanceCovered.setText(String.format("%.1f", Double.valueOf(statsValues[0])));
+                    distanceValid.setText(String.format("%.2f", Double.valueOf(statsValues[0])));
+                    distanceCovered.setText(String.format("%.2f", Double.valueOf(statsValues[0])));
                     percentDistance.setText(String.format("%d", Double.valueOf(statsValues[2]*100).intValue()));
                     averageSpeed.setText(String.format("%d", Double.valueOf(statsValues[3]).intValue()));
                     maxSpeed.setText(String.format("%d", Double.valueOf(statsValues[4]).intValue()));
