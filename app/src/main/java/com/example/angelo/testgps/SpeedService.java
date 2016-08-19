@@ -73,14 +73,15 @@ public class SpeedService extends Service implements LocationListener{
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent stopIntent = new Intent(this, SpeedService.class);
+        Intent stopIntent = new Intent(this, MainActivity.class);
         stopIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
-//        PendingIntent resultStopIntent= PendingIntent.getService(
-//                this,
-//                0,
-//                stopIntent,
-//                PendingIntent.FLAG_CANCEL_CURRENT
-//        );
+        PendingIntent resultStopIntent= PendingIntent.getService(
+                this,
+                0,
+                stopIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT
+        );
+
         mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.poke_speed)
                 .setContentTitle("Pokespeed")
@@ -110,7 +111,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 5) {
+        if(location.getAccuracy() <= 10) {
             Float speed = null;
             if (location.hasSpeed()) {
                 speed = location.getSpeed(); // m/s
