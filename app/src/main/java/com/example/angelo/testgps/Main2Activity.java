@@ -1,18 +1,8 @@
 package com.example.angelo.testgps;
 
-import android.Manifest;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
+import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,20 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.ToggleButton;
 
-public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
-
-
-    private ToggleButton speedToggle;
-    private Button btn_stats;
-    private static boolean toggledOff = true;
-    private boolean mBound = false;
-    private SpeedService speedService;
-    private static PokeSpeedStats stats;
+public class Main2Activity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener,
+        MainFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,149 +23,35 @@ public class Main2Activity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        stats = null;
-        speedToggle = (ToggleButton)findViewById(R.id.toggleSpeedService);
-        speedToggle.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(toggledOff)
-                    startSpeedService();
-                else
-                    stopSpeedService();
-            }
-        });
-        btn_stats = (Button)findViewById(R.id.button_stats);
-        btn_stats.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(stats != null) {
-                    double[] statsValues = stats.getStats();
-                    TextView distanceValid = (TextView)findViewById(R.id.validDistance);
-                    TextView distanceCovered = (TextView)findViewById(R.id.distanceCovered);
-                    TextView percentDistance = (TextView)findViewById(R.id.percentDistance);
-                    TextView averageSpeed = (TextView)findViewById(R.id.averageSpeed);
-                    TextView maxSpeed = (TextView)findViewById(R.id.maxSpeed);
-
-                    distanceValid.setText(String.format("%.2f", Double.valueOf(statsValues[0])));
-                    distanceCovered.setText(String.format("%.2f", Double.valueOf(statsValues[0])));
-                    percentDistance.setText(String.format("%d", Double.valueOf(statsValues[2]*100).intValue()));
-                    averageSpeed.setText(String.format("%d", Double.valueOf(statsValues[3]).intValue()));
-                    maxSpeed.setText(String.format("%d", Double.valueOf(statsValues[4]).intValue()));
-                }
-            }
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        speedToggle.setChecked(!toggledOff);
-        if(!toggledOff)
-            _bindService();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        _unbindService();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        _unbindService();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _unbindService();
     }
-
-    private void stopSpeedService() {
-        _unbindService();
-        stopService(new Intent(this, SpeedService.class));
-        toggledOff = true;
-    }
-
-    private void startSpeedService() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    1);
-        }
-        else {
-            _startSpeedService();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length > 0 && grantResults[0] != -1) {
-            _startSpeedService();
-        }
-
-    }
-
-    private void _bindService() {
-        if(!mBound) {
-            bindService(new Intent(this, SpeedService.class), this.mConnection, Context.BIND_AUTO_CREATE);
-            mBound = true;
-        }
-    }
-
-    private void _unbindService() {
-        if(mBound) {
-            unbindService(this.mConnection);
-            mBound = false;
-        }
-    }
-
-    private void _startSpeedService() {
-        startService(new Intent(this, SpeedService.class));
-        _bindService();
-        toggledOff = false;
-    }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            speedService = ((SpeedService.LocalBinder) service).getService();
-            stats = speedService.getStatsObj();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-            speedService = null;
-        }
-    };
-
-
-
-
-
 
     @Override
     public void onBackPressed() {
@@ -226,7 +92,9 @@ public class Main2Activity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+            MainFragment mainFragment = MainFragment.newInstance("ok1", "ok2");
+            FragmentManager manager = getSupportFragmentManager();
+            manager.beginTransaction().replace(R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
         } else if (id == R.id.nav_gallery) {
 
         }  else if (id == R.id.nav_share) {
@@ -238,5 +106,10 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
