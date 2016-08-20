@@ -16,10 +16,15 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         MainFragment.OnFragmentInteractionListener {
 
+    private final MainFragment mainFragment = MainFragment.newInstance("1", "2");
+    private final SettingsFragment settingsFragment = SettingsFragment.newInstance("1", "2");
+    private final FragmentManager manager = getSupportFragmentManager();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        manager.beginTransaction().replace(R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -92,13 +97,11 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            MainFragment mainFragment = MainFragment.newInstance("ok1", "ok2");
-            FragmentManager manager = getSupportFragmentManager();
             manager.beginTransaction().replace(R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
         } else if (id == R.id.nav_gallery) {
 
         }  else if (id == R.id.nav_share) {
-
+            manager.beginTransaction().replace(R.id.layout_main, settingsFragment, settingsFragment.getTag()).commit();
         } else if (id == R.id.nav_send) {
 
         }
