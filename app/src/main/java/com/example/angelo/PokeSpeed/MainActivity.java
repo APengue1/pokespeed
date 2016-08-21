@@ -18,13 +18,14 @@ public class MainActivity extends AppCompatActivity implements
         MainFragment.OnFragmentInteractionListener {
 
     private final MainFragment mainFragment = MainFragment.newInstance("1", "2");
-    private final FragmentManager manager = getSupportFragmentManager();
+    private final FragmentManager mFragment = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        manager.beginTransaction().replace(R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
+        mFragment.beginTransaction().replace(
+                R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     @Override
@@ -90,19 +92,19 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            manager.beginTransaction().replace(R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_main) {
+            mFragment.beginTransaction().replace(
+                    R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
+        } else if (id == R.id.nav_stats) {
 
-        }  else if (id == R.id.nav_share) {
+        }  else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_feedback) {
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
