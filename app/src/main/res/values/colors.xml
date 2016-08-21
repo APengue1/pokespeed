@@ -3,4 +3,5 @@
     <color name="colorPrimary">#FE0000</color>
     <color name="colorPrimaryDark">#C3282E</color>
     <color name="colorAccent">#F8D000</color>
+    <color name="colorPokeBlue">#020CA5</color>
 </resources>

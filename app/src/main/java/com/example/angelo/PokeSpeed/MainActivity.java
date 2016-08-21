@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements
     private final MainFragment mainFragment = MainFragment.newInstance("1", "2");
     private final StatsFragment statsFragment = StatsFragment.newInstance("1", "2");
     private final FragmentManager mFragment = getSupportFragmentManager();
+    static PokeSpeedStats stats = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

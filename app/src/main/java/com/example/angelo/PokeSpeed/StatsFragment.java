@@ -7,6 +7,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.Locale;
 
 
 /**
@@ -22,6 +26,8 @@ public class StatsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private Button btn_stats;
+    private static PokeSpeedStats stats;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -58,13 +64,35 @@ public class StatsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stats, container, false);
+        final View view = inflater.inflate(
+                R.layout.fragment_stats, container, false);
+        stats = MainActivity.stats;
+        btn_stats = (Button)view.findViewById(R.id.button_stats);
+        btn_stats.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(stats != null) {
+                    double[] statsValues = stats.getStats();
+                    TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
+                    TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
+                    TextView percentDistance = (TextView)view.findViewById(R.id.percentDistance);
+                    TextView averageSpeed = (TextView)view.findViewById(R.id.averageSpeed);
+                    TextView maxSpeed = (TextView)view.findViewById(R.id.maxSpeed);
+
+                    Locale l = Locale.getDefault();
+                    distanceValid.setText(String.format(l,"%.2f", statsValues[0]));
+                    distanceCovered.setText(String.format(l,"%.2f", statsValues[0]));
+                    percentDistance.setText(String.format(l,"%d", Double.valueOf(statsValues[2]*100).intValue()));
+                    averageSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[3]).intValue()));
+                    maxSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[4]).intValue()));
+                }
+            }
+        });        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

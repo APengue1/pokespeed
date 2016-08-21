@@ -30,11 +30,13 @@ public class SpeedService extends Service implements LocationListener{
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
     private final IBinder mBinder = new LocalBinder();
     private static final PokeSpeedStats STATS = new PokeSpeedStats();
+    private static int lastSpeed;
 
     @Override
     public void onCreate() {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
+        lastSpeed = 0;
         initNotification();
         requestLocation();
         super.onCreate();
@@ -109,6 +111,10 @@ public class SpeedService extends Service implements LocationListener{
         }
     }
 
+    public static int getLastSpeed() {
+        return lastSpeed;
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         if(location.getAccuracy() <= 10) {
@@ -176,6 +182,7 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder.setContentTitle(speedInt.toString());
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
+        lastSpeed = speedInt;
     }
 
     @Override

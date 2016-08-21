@@ -38,11 +38,9 @@ public class MainFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private ToggleButton speedToggle;
-    private Button btn_stats;
     private static boolean toggledOff = true;
     private boolean mBound = false;
     private SpeedService speedService;
-    private static PokeSpeedStats stats;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -84,11 +82,11 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        final RelativeLayout r = (RelativeLayout)inflater.inflate(
+        final View view = inflater.inflate(
                 R.layout.fragment_main, container, false);
 
-        stats = null;
-        speedToggle = (ToggleButton)r.findViewById(R.id.toggleSpeedService);
+
+        speedToggle = (ToggleButton)view.findViewById(R.id.toggleSpeedService);
         speedToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if(toggledOff)
@@ -97,29 +95,9 @@ public class MainFragment extends Fragment {
                     stopSpeedService();
             }
         });
-        btn_stats = (Button)r.findViewById(R.id.button_stats);
-        btn_stats.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(stats != null) {
-                    double[] statsValues = stats.getStats();
-                    TextView distanceValid = (TextView)r.findViewById(R.id.validDistance);
-                    TextView distanceCovered = (TextView)r.findViewById(R.id.distanceCovered);
-                    TextView percentDistance = (TextView)r.findViewById(R.id.percentDistance);
-                    TextView averageSpeed = (TextView)r.findViewById(R.id.averageSpeed);
-                    TextView maxSpeed = (TextView)r.findViewById(R.id.maxSpeed);
-
-                    Locale l = Locale.getDefault();
-                    distanceValid.setText(String.format(l,"%.2f", statsValues[0]));
-                    distanceCovered.setText(String.format(l,"%.2f", statsValues[0]));
-                    percentDistance.setText(String.format(l,"%d", Double.valueOf(statsValues[2]*100).intValue()));
-                    averageSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[3]).intValue()));
-                    maxSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[4]).intValue()));
-                }
-            }
-        });
 
         speedToggle.setChecked(!toggledOff);
-        return r;
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -219,8 +197,9 @@ public class MainFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             speedService = ((SpeedService.LocalBinder) service).getService();
-            stats = speedService.getStatsObj();
+            MainActivity.stats = speedService.getStatsObj();
             mBound = true;
+            //_unbindService();
         }
 
         @Override
