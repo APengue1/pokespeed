@@ -15,9 +15,11 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        MainFragment.OnFragmentInteractionListener {
+        MainFragment.OnFragmentInteractionListener,
+        StatsFragment.OnFragmentInteractionListener {
 
     private final MainFragment mainFragment = MainFragment.newInstance("1", "2");
+    private final StatsFragment statsFragment = StatsFragment.newInstance("1", "2");
     private final FragmentManager mFragment = getSupportFragmentManager();
 
     @Override
@@ -101,7 +103,8 @@ public class MainActivity extends AppCompatActivity implements
             mFragment.beginTransaction().replace(
                     R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
         } else if (id == R.id.nav_stats) {
-
+            mFragment.beginTransaction().replace(
+                    R.id.layout_main, statsFragment, statsFragment.getTag()).commit();
         }  else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_feedback) {
