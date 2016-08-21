@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Testgps</string>
+    <string name="app_name">PokeSpeed</string>
     <string name="title_activity_stats">Stats</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

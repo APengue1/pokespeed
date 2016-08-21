@@ -1,4 +1,4 @@
-package com.example.angelo.testgps;
+package com.example.angelo.PokeSpeed;
 
 import android.app.PendingIntent;
 import android.app.Service;

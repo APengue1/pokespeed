@@ -7,8 +7,6 @@
    <SwitchPreference
        android:summaryOn="Imperial Units"
        android:summaryOff="Imperial Units"
-       android:switchTextOff="KMH"
-       android:switchTextOn="MPH"
        android:key="imperial"
        >
    </SwitchPreference>

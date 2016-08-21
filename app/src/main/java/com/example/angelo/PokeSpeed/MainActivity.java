@@ -1,4 +1,4 @@
-package com.example.angelo.testgps;
+package com.example.angelo.PokeSpeed;
 
 import android.content.Intent;
 import android.net.Uri;

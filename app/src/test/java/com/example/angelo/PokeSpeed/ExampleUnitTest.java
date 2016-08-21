@@ -1,4 +1,4 @@
-package com.example.angelo.testgps;
+package com.example.angelo.PokeSpeed;
 
 import org.junit.Test;
 
