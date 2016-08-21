@@ -1,9 +1,10 @@
 package com.example.angelo.testgps;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,7 +18,6 @@ public class MainActivity extends AppCompatActivity implements
         MainFragment.OnFragmentInteractionListener {
 
     private final MainFragment mainFragment = MainFragment.newInstance("1", "2");
-    private final SettingsFragment settingsFragment = SettingsFragment.newInstance("1", "2");
     private final FragmentManager manager = getSupportFragmentManager();
 
     @Override
@@ -101,9 +101,8 @@ public class MainActivity extends AppCompatActivity implements
         } else if (id == R.id.nav_gallery) {
 
         }  else if (id == R.id.nav_share) {
-            manager.beginTransaction().replace(R.id.layout_main, settingsFragment, settingsFragment.getTag()).commit();
+            startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -115,4 +114,13 @@ public class MainActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults.length > 0 && grantResults[0] != -1) {
+            mainFragment.startSpeedService();
+        }
+    }
+
 }

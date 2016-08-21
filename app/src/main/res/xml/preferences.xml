@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+   <SwitchPreference
+       android:summaryOn="Imperial Units"
+       android:summaryOff="Imperial Units"
+       android:switchTextOff="KMH"
+       android:switchTextOn="MPH"
+       android:key="imperial"
+       >
+   </SwitchPreference>
+   <SwitchPreference
+       android:summaryOn="Vibrate"
+       android:summaryOff="Vibrate"
+       android:key="vibrate">
+   </SwitchPreference>
+
+</PreferenceScreen>

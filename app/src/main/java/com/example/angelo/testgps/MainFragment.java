@@ -165,17 +165,18 @@ public class MainFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private void stopSpeedService() {
+    public void stopSpeedService() {
         _unbindService();
         getActivity().stopService(new Intent(getActivity(), SpeedService.class));
+        speedToggle.setChecked(false);
         toggledOff = true;
     }
 
-    private void startSpeedService() {
+    public void startSpeedService() {
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-
+            speedToggle.setChecked(false);
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
@@ -209,6 +210,7 @@ public class MainFragment extends Fragment {
 
     private void _startSpeedService() {
         getActivity().startService(new Intent(getActivity(), SpeedService.class));
+        speedToggle.setChecked(true);
         _bindService();
         toggledOff = false;
     }
