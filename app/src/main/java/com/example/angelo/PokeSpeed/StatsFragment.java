@@ -73,26 +73,31 @@ public class StatsFragment extends Fragment {
         final View view = inflater.inflate(
                 R.layout.fragment_stats, container, false);
         stats = MainActivity.stats;
+        showStats(view);
         btn_stats = (Button)view.findViewById(R.id.button_stats);
         btn_stats.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(stats != null) {
-                    double[] statsValues = stats.getStats();
-                    TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
-                    TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
-                    TextView percentDistance = (TextView)view.findViewById(R.id.percentDistance);
-                    TextView averageSpeed = (TextView)view.findViewById(R.id.averageSpeed);
-                    TextView maxSpeed = (TextView)view.findViewById(R.id.maxSpeed);
-
-                    Locale l = Locale.getDefault();
-                    distanceValid.setText(String.format(l,"%.2f", statsValues[0]));
-                    distanceCovered.setText(String.format(l,"%.2f", statsValues[0]));
-                    percentDistance.setText(String.format(l,"%d", Double.valueOf(statsValues[2]*100).intValue()));
-                    averageSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[3]).intValue()));
-                    maxSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[4]).intValue()));
-                }
+                showStats(view);
             }
         });        return view;
+    }
+
+    private void showStats(View view) {
+        if(stats != null) {
+            double[] statsValues = stats.getStats();
+            TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
+            TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
+            TextView percentDistance = (TextView)view.findViewById(R.id.percentDistance);
+            TextView averageSpeed = (TextView)view.findViewById(R.id.averageSpeed);
+            TextView maxSpeed = (TextView)view.findViewById(R.id.maxSpeed);
+
+            Locale l = Locale.getDefault();
+            distanceValid.setText(String.format(l,"%.2f", statsValues[0]));
+            distanceCovered.setText(String.format(l,"%.2f", statsValues[0]));
+            percentDistance.setText(String.format(l,"%d", Double.valueOf(statsValues[2]*100).intValue()));
+            averageSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[3]).intValue()));
+            maxSpeed.setText(String.format(l,"%d", Double.valueOf(statsValues[4]).intValue()));
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
