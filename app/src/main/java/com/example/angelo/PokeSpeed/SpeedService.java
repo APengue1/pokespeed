@@ -117,25 +117,22 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 10) {
-            Float speed = null;
-            if (location.hasSpeed()) {
-                speed = location.getSpeed(); // m/s
-                speed = speed * 60 * 60 / 1000; // km/h
-                setSpeed(speed);
-            } else if (this.lastLocation == null || this.lastTime == null) {
-                this.lastLocation = location;
-                this.lastTime = location.getTime(); // ms
-            } else {
-                float distanceCovered = location.distanceTo(this.lastLocation); // m
-                long timeElapsed = location.getTime() - this.lastTime; //ms
-                this.lastLocation = location;
-                this.lastTime = location.getTime();
-                speed = distanceCovered / timeElapsed; // m/ms
-                speed = speed * 60 * 60 * 60 / 1000; // km/h
-                setSpeed(speed);
-            }
+        if(location.getAccuracy() <= 10 && location.hasSpeed()) {
+            Float speed = location.getSpeed(); // m/s
+            speed = speed * 60 * 60 / 1000; // km/h
+            setSpeed(speed);
             STATS.giveLocation(location, speed);
+//            } else if (this.lastLocation == null || this.lastTime == null) {
+//                this.lastLocation = location;
+//                this.lastTime = location.getTime(); // ms
+//            } else {
+//                float distanceCovered = location.distanceTo(this.lastLocation); // m
+//                long timeElapsed = location.getTime() - this.lastTime; //ms
+//                this.lastLocation = location;
+//                this.lastTime = location.getTime();
+//                speed = distanceCovered / timeElapsed; // m/ms
+//                speed = speed * 60 * 60 * 60 / 1000; // km/h
+//                setSpeed(speed);
         }
         else {
             setInaccurate();
