@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/toggleSpeedService"
         android:checked="false"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="30dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
@@ -25,11 +25,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Speed Placeholder"
         android:id="@+id/mainSpeed"
         android:layout_above="@+id/toggleSpeedService"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="175dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="kmh"
+        android:id="@+id/speedUnit"
+        android:layout_alignTop="@+id/mainSpeed"
+        android:layout_toRightOf="@+id/toggleSpeedService"
+        android:layout_toEndOf="@+id/toggleSpeedService" />
 
 
 </RelativeLayout>

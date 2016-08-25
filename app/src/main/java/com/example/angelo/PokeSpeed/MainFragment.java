@@ -5,10 +5,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -36,6 +38,9 @@ public class MainFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private SharedPreferences prefs;
+
+    private TextView speedUnit;
     private TextView mainSpeed;
     private ToggleButton speedToggle;
     private static boolean toggledOff = true;
@@ -76,6 +81,7 @@ public class MainFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 
     @Override
@@ -86,6 +92,7 @@ public class MainFragment extends Fragment {
                 R.layout.fragment_main, container, false);
 
         mainSpeed = (TextView)view.findViewById(R.id.mainSpeed);
+        speedUnit = (TextView)view.findViewById(R.id.speedUnit);
 
         speedToggle = (ToggleButton)view.findViewById(R.id.toggleSpeedService);
         speedToggle.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +119,10 @@ public class MainFragment extends Fragment {
                             @Override
                             public void run() {
                                 mainSpeed.setText(speedService.getLastSpeed());
+                                if(prefs.getBoolean("imperial", false))
+                                    speedUnit.setText("mph");
+                                else
+                                    speedUnit.setText("kmh");
                             }
                         });
                     else
