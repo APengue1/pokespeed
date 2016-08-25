@@ -104,21 +104,23 @@ public class MainFragment extends Fragment {
     private void refreshSpeed() {
         Timer speedTimer = new Timer();
         speedTimer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(mBound)
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mainSpeed.setText(speedService.getLastSpeed());
-                                }
-                            });
+            new TimerTask() {
+                @Override
+                public void run() {
+                    if(mBound)
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mainSpeed.setText(speedService.getLastSpeed());
+                            }
+                        });
+                    else
+                        cancel();
 
-                    }
-                },
-                0,
-                1000);
+                }
+            },
+            0,
+            1000);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
