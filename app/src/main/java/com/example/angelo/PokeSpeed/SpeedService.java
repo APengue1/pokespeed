@@ -30,7 +30,7 @@ public class SpeedService extends Service implements LocationListener{
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
     private final IBinder mBinder = new LocalBinder();
     private static final PokeSpeedStats STATS = new PokeSpeedStats();
-    private static int lastSpeed;
+    private static Integer lastSpeed;
 
     @Override
     public void onCreate() {
@@ -111,8 +111,8 @@ public class SpeedService extends Service implements LocationListener{
         }
     }
 
-    public static int getLastSpeed() {
-        return lastSpeed;
+    public static String getLastSpeed() {
+        return lastSpeed.toString();
     }
 
     @Override

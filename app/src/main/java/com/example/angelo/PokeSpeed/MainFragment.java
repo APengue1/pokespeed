@@ -15,12 +15,11 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +36,7 @@ public class MainFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private TextView mainSpeed;
     private ToggleButton speedToggle;
     private static boolean toggledOff = true;
     private boolean mBound = false;
@@ -85,6 +85,7 @@ public class MainFragment extends Fragment {
         final View view = inflater.inflate(
                 R.layout.fragment_main, container, false);
 
+        mainSpeed = (TextView)view.findViewById(R.id.mainSpeed);
 
         speedToggle = (ToggleButton)view.findViewById(R.id.toggleSpeedService);
         speedToggle.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +99,26 @@ public class MainFragment extends Fragment {
 
         speedToggle.setChecked(!toggledOff);
         return view;
+    }
+
+    private void refreshSpeed() {
+        Timer speedTimer = new Timer();
+        speedTimer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(mBound)
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mainSpeed.setText(speedService.getLastSpeed());
+                                }
+                            });
+
+                    }
+                },
+                0,
+                1000);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -199,6 +220,7 @@ public class MainFragment extends Fragment {
             speedService = ((SpeedService.LocalBinder) service).getService();
             MainActivity.stats = speedService.getStatsObj();
             mBound = true;
+            refreshSpeed();
             //_unbindService();
         }
 
