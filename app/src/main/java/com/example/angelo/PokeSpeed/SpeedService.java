@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
@@ -19,10 +21,11 @@ public class SpeedService extends Service implements LocationListener{
 
     static final int SPEED_RED = 17, SPEED_YELLOW = 14;
 
+    private SharedPreferences prefs;
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
-    private Location lastLocation;
-    private Long lastTime;
+    //private Location lastLocation;
+    //private Long lastTime;
     private NotificationManagerCompat notificationManager;
     private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
     private static final long[] VIBRATE_RED = new long[]{500, 500};
@@ -34,6 +37,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onCreate() {
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
         lastSpeed = 0;
@@ -117,7 +121,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 7 && location.hasSpeed()) {
+        if(location.getAccuracy() <= 10 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
@@ -162,15 +166,18 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void setSpeed(Float speed) {
-        Integer speedInt = Math.round(speed);
+        boolean bVibrate = prefs.getBoolean("vibrate", true);
+        Integer speedInt = getSpeedForLocale(speed);
         int argb;
         if(speedInt > SPEED_RED) {
             argb = Color.RED;
-            mBuilder.setVibrate(SpeedService.VIBRATE_RED);
+            if(bVibrate)
+                mBuilder.setVibrate(SpeedService.VIBRATE_RED);
         }
         else if(speedInt > SPEED_YELLOW) {
             argb = Color.YELLOW;
-            mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
+            if(bVibrate)
+                mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
         }
         else {
             argb = Color.GREEN;
@@ -180,6 +187,14 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
         lastSpeed = speedInt;
+    }
+
+    private int getSpeedForLocale(float i) {
+        boolean bImperial = prefs.getBoolean("imperial", false);
+        if(bImperial)
+            return Math.round(i * 0.621371f);
+        else
+            return Math.round(i);
     }
 
     @Override
