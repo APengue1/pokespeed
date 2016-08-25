@@ -108,11 +108,22 @@ public class MainActivity extends AppCompatActivity implements
         }  else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         } else if (id == R.id.nav_feedback) {
+            sendFeedbackEmail();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void sendFeedbackEmail() {
+        String[] address = {getResources().getString(R.string.feedbackEmail)};
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setData(Uri.parse("mailto:"));
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, address);
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.feedbackSubject));
+        if(emailIntent.resolveActivity(getPackageManager()) != null)
+            startActivity(emailIntent);
     }
 
     @Override
