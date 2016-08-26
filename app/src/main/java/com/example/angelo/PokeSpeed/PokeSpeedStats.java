@@ -41,23 +41,27 @@ public class PokeSpeedStats {
     }
 
     public double[] getStats(SharedPreferences prefs) {
-        double percentDistanceValid = 0, averageSpeed = 0;
-        if(distanceCovered != 0)
-            percentDistanceValid = distanceValid / distanceCovered;
+        double percentDistanceValid = 0,
+                averageSpeed = 0,
+                _distanceValid = distanceValid,
+                _distanceCovered = distanceCovered,
+                _maxSpeed = maxSpeed;
+        if(_distanceCovered != 0)
+            percentDistanceValid = _distanceValid / _distanceCovered;
         if(numberRecordings != 0)
             averageSpeed = speedTotal / numberRecordings;
         if (prefs.getBoolean("imperial", false)) {
-            distanceValid *= 0.621371;
-            distanceCovered *= 0.621371;
+            _distanceValid *= 0.621371;
+            _distanceCovered *= 0.621371;
             averageSpeed *= 0.621371;
-            maxSpeed *= 0.621371;
+            _maxSpeed *= 0.621371;
         }
         return new double[] {
-                distanceValid,
-                distanceCovered,
+                _distanceValid,
+                _distanceCovered,
                 percentDistanceValid,
                 averageSpeed,
-                maxSpeed
+                _maxSpeed
         };
     }
 }
