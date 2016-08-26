@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity implements
         MainFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener {
 
-    private final MainFragment mainFragment = MainFragment.newInstance("1", "2");
-    private final StatsFragment statsFragment = StatsFragment.newInstance("1", "2");
+    private final MainFragment mainFragment = MainFragment.newInstance();
+    private final StatsFragment statsFragment = StatsFragment.newInstance();
     private final FragmentManager mFragment = getSupportFragmentManager();
     static PokeSpeedStats stats = null;
 

@@ -1,6 +1,8 @@
 package com.example.angelo.PokeSpeed;
 
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.preference.PreferenceManager;
 
 public class PokeSpeedStats {
 
@@ -38,12 +40,18 @@ public class PokeSpeedStats {
         }
     }
 
-    public double[] getStats() {
+    public double[] getStats(SharedPreferences prefs) {
         double percentDistanceValid = 0, averageSpeed = 0;
         if(distanceCovered != 0)
             percentDistanceValid = distanceValid / distanceCovered;
         if(numberRecordings != 0)
             averageSpeed = speedTotal / numberRecordings;
+        if (prefs.getBoolean("imperial", false)) {
+            distanceValid *= 0.621371;
+            distanceCovered *= 0.621371;
+            averageSpeed *= 0.621371;
+            maxSpeed *= 0.621371;
+        }
         return new double[] {
                 distanceValid,
                 distanceCovered,
