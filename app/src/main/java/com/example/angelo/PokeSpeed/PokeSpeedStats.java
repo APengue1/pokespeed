@@ -2,7 +2,6 @@ package com.example.angelo.PokeSpeed;
 
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.preference.PreferenceManager;
 
 public class PokeSpeedStats {
 

@@ -99,19 +99,19 @@ public class MainFragment extends Fragment {
             new TimerTask() {
                 @Override
                 public void run() {
-                    if(mBound)
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mainSpeed.setText(speedService.getLastSpeed());
-                                if(prefs.getBoolean("imperial", false))
-                                    speedUnit.setText("mph");
-                                else
-                                    speedUnit.setText("kmh");
-                            }
-                        });
-                    else
-                        cancel();
+                if(mBound)
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mainSpeed.setText(speedService.getLastSpeed());
+                            if(prefs.getBoolean("imperial", false))
+                                speedUnit.setText("mph");
+                            else
+                                speedUnit.setText("kmh");
+                        }
+                    });
+                else
+                    cancel();
 
                 }
             },

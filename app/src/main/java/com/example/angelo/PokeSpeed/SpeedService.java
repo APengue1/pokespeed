@@ -31,6 +31,8 @@ public class SpeedService extends Service implements LocationListener{
     private static final long[] VIBRATE_RED = new long[]{500, 500};
     private static final int NOTIFY_ID = 1;
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
+    private static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
+    private static final String PLAY_SERVICE_ACTION = "Play Service Action";
     private final IBinder mBinder = new LocalBinder();
     private static final PokeSpeedStats STATS = new PokeSpeedStats();
     private static Integer lastSpeed;
@@ -41,9 +43,58 @@ public class SpeedService extends Service implements LocationListener{
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
         lastSpeed = 0;
+
+        mBuilder = getDefaultBuilder();
+        addPauseAction(mBuilder);
         initNotification();
         requestLocation();
         super.onCreate();
+    }
+
+    private void addPauseAction(NotificationCompat.Builder mBuilder) {
+        Intent pauseIntent = new Intent(this, SpeedService.class);
+        pauseIntent.setAction(SpeedService.PAUSE_SERVICE_ACTION);
+        PendingIntent resultPauseIntent= PendingIntent.getService(
+                this,
+                0,
+                pauseIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT
+        );
+        mBuilder.addAction(R.drawable.ic_pause_black_24dp, "Pause", resultPauseIntent);
+    }
+
+    private void addPlayAction(NotificationCompat.Builder mBuilder) {
+        Intent playIntent = new Intent(this, SpeedService.class);
+        playIntent.setAction(SpeedService.PLAY_SERVICE_ACTION);
+        PendingIntent resultPlayIntent= PendingIntent.getService(
+                this,
+                0,
+                playIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT
+        );
+        mBuilder.addAction(R.drawable.ic_play_arrow_black_24dp, "Play", resultPlayIntent);
+    }
+
+    private NotificationCompat.Builder getDefaultBuilder() {
+        Intent stopIntent = new Intent(this, SpeedService.class);
+        stopIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
+        PendingIntent resultStopIntent= PendingIntent.getService(
+                this,
+                0,
+                stopIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT
+        );
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        return new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.poke_speed)
+                .setContentTitle("Pokespeed")
+                .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
+                .setContentIntent(resultPendingIntent);
     }
 
     public class LocalBinder extends Binder {
@@ -63,36 +114,29 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent.getAction() != null &&
-                intent.getAction().compareTo(SpeedService.STOP_SERVICE_ACTION) == 0) {
-            stopForeground(true);
-            stopSelf();
+        if(intent.getAction() != null) {
+            if (intent.getAction().equals(SpeedService.STOP_SERVICE_ACTION)) {
+                removeLocation();
+                stopForeground(true);
+                stopSelf();
+            }
+            else if(intent.getAction().equals(SpeedService.PAUSE_SERVICE_ACTION)) {
+                removeLocation();
+                mBuilder = getDefaultBuilder();
+                addPlayAction(mBuilder);
+                initNotification();
+            }
+            else if(intent.getAction().equals(SpeedService.PLAY_SERVICE_ACTION)) {
+                requestLocation();
+                mBuilder = getDefaultBuilder();
+                addPauseAction(mBuilder);
+                initNotification();
+            }
         }
         return START_NOT_STICKY;
     }
 
     private void initNotification() {
-        Intent resultIntent = new Intent(this, MainActivity.class);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                resultIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Intent stopIntent = new Intent(this, MainActivity.class);
-        stopIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
-        PendingIntent resultStopIntent= PendingIntent.getService(
-                this,
-                0,
-                stopIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT
-        );
-
-        mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.poke_speed)
-                .setContentTitle("Pokespeed")
-                //.addAction(android.R.drawable.ic_media_pause, "Stop", resultStopIntent)
-                .setContentIntent(resultPendingIntent);
         startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
