@@ -19,9 +19,9 @@ import android.support.v4.app.NotificationManagerCompat;
 
 public class SpeedService extends Service implements LocationListener{
 
-    static final int SPEED_RED = 17, SPEED_YELLOW = 14;
-
     private SharedPreferences prefs;
+    private int SPEED_RED, SPEED_YELLOW;
+
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
     //private Location lastLocation;
@@ -34,12 +34,15 @@ public class SpeedService extends Service implements LocationListener{
     private static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
     private static final String PLAY_SERVICE_ACTION = "Play Service Action";
     private final IBinder mBinder = new LocalBinder();
-    private static final PokeSpeedStats STATS = new PokeSpeedStats();
+    private  PokeSpeedStats STATS;
     private static Integer lastSpeed;
 
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "17"));
+        SPEED_YELLOW = SPEED_RED - 4;
+        STATS =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
         lastSpeed = 0;

@@ -69,7 +69,7 @@ public class StatsFragment extends Fragment {
 
     private void showStats(View view) {
         if(stats != null) {
-            double[] statsValues = stats.getStats(prefs);
+            double[] statsValues = stats.getStats();
             TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
             TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
             TextView percentDistance = (TextView)view.findViewById(R.id.percentDistance);

@@ -15,5 +15,9 @@
        android:summaryOff="Vibrate"
        android:key="vibrate">
    </SwitchPreference>
+   <EditTextPreference
+       android:key="maxSpeed"
+       android:defaultValue="17">
+   </EditTextPreference>
 
 </PreferenceScreen>
