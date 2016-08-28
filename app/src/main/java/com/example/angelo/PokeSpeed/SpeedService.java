@@ -172,6 +172,8 @@ public class SpeedService extends Service implements LocationListener{
     public void onLocationChanged(Location location) {
         if(location.getAccuracy() <= 7 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
+            speed = speed * 60 * 60 / 1000; // km/h
+            setSpeed(speed);
             if(speed < 0.5)
                 if(lowSpeedCount >= 3)
                     return;
@@ -179,8 +181,6 @@ public class SpeedService extends Service implements LocationListener{
                     lowSpeedCount++;
             else
                 lowSpeedCount = 0;
-            speed = speed * 60 * 60 / 1000; // km/h
-            setSpeed(speed);
             STATS.giveLocation(location, speed);
 //            } else if (this.lastLocation == null || this.lastTime == null) {
 //                this.lastLocation = location;
