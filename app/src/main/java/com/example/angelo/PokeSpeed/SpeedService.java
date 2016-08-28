@@ -36,16 +36,18 @@ public class SpeedService extends Service implements LocationListener{
     private final IBinder mBinder = new LocalBinder();
     private  PokeSpeedStats STATS;
     private static Integer lastSpeed;
+    private int lowSpeedCount;
 
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "17"));
-        SPEED_YELLOW = SPEED_RED - 4;
+        SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "11"));
+        SPEED_YELLOW = SPEED_RED - 3;
         STATS =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
         lastSpeed = 0;
+        lowSpeedCount = 0;
 
         mBuilder = getDefaultBuilder();
         addPauseAction(mBuilder);
@@ -170,6 +172,13 @@ public class SpeedService extends Service implements LocationListener{
     public void onLocationChanged(Location location) {
         if(location.getAccuracy() <= 7 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
+            if(speed < 0.5)
+                if(lowSpeedCount >= 3)
+                    return;
+                else
+                    lowSpeedCount++;
+            else
+                lowSpeedCount = 0;
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
             STATS.giveLocation(location, speed);

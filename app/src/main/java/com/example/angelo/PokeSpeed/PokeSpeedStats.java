@@ -22,7 +22,7 @@ public class PokeSpeedStats {
         maxSpeed = 0;
         lastLocation = null;
         prefs = _prefs;
-        speedRed = Integer.parseInt(prefs.getString("maxSpeed", "17"));
+        speedRed = Integer.parseInt(prefs.getString("maxSpeed", "11"));
     }
 
     public void giveLocation(Location location, Float speed) {
