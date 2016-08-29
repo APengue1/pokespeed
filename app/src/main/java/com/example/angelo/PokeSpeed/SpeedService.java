@@ -175,7 +175,7 @@ public class SpeedService extends Service implements LocationListener{
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
             if(speed < 0.5)
-                if(lowSpeedCount >= 3)
+                if(lowSpeedCount >= 2)
                     return;
                 else
                     lowSpeedCount++;
