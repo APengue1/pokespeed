@@ -34,16 +34,17 @@ public class SpeedService extends Service implements LocationListener{
     private static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
     private static final String PLAY_SERVICE_ACTION = "Play Service Action";
     private final IBinder mBinder = new LocalBinder();
-    private  PokeSpeedStats STATS;
+    private PokeSpeedStats stats;
     private static Integer lastSpeed;
     private int lowSpeedCount;
+    static boolean serviceOn = false;
 
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "11"));
         SPEED_YELLOW = SPEED_RED - 3;
-        STATS =  new PokeSpeedStats(prefs);
+        stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
         lastSpeed = 0;
@@ -53,6 +54,7 @@ public class SpeedService extends Service implements LocationListener{
         addPauseAction(mBuilder);
         initNotification();
         requestLocation();
+        serviceOn = false;
         super.onCreate();
     }
 
@@ -109,7 +111,7 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     public PokeSpeedStats getStatsObj() {
-        return STATS;
+        return stats;
     }
 
     @Override
@@ -119,9 +121,11 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        serviceOn = true;
         if(intent.getAction() != null) {
             if (intent.getAction().equals(SpeedService.STOP_SERVICE_ACTION)) {
                 removeLocation();
+                serviceOn = false;
                 stopForeground(true);
                 stopSelf();
             }
@@ -181,7 +185,7 @@ public class SpeedService extends Service implements LocationListener{
                     lowSpeedCount++;
             else
                 lowSpeedCount = 0;
-            STATS.giveLocation(location, speed);
+            stats.giveLocation(location, speed);
 //            } else if (this.lastLocation == null || this.lastTime == null) {
 //                this.lastLocation = location;
 //                this.lastTime = location.getTime(); // ms
@@ -256,6 +260,8 @@ public class SpeedService extends Service implements LocationListener{
     @Override
     public void onDestroy() {
         removeLocation();
+        serviceOn = false;
+        stopSelf();
         super.onDestroy();
     }
 

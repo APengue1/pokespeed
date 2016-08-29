@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -23,6 +22,8 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -39,6 +40,7 @@ public class StatsFragment extends Fragment {
     private static PokeSpeedStats stats;
     private OnFragmentInteractionListener mListener;
     private SharedPreferences prefs;
+    private View lastView;
 
     public StatsFragment() {
 
@@ -74,7 +76,10 @@ public class StatsFragment extends Fragment {
             public void onClick(View v) {
                 showStats(view);
             }
-        });        return view;
+        });
+        lastView = view;
+        refreshStats(view);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -130,8 +135,8 @@ public class StatsFragment extends Fragment {
             float fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
             float fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
             Integer fpercentDistance = Double.valueOf(statsValues[2]*100).intValue();
-            Integer faverageSpeed = Double.valueOf(statsValues[3]).intValue();
-            Integer fmaxSpeed = Double.valueOf(statsValues[4]).intValue();
+            float faverageSpeed = Double.valueOf(statsValues[3]).floatValue();
+            float fmaxSpeed = Double.valueOf(statsValues[4]).floatValue();
 
             Locale l = Locale.getDefault();
 //            distanceValid.setText(String.format(l,"%.2f", fDistanceValid));
@@ -159,11 +164,12 @@ public class StatsFragment extends Fragment {
 
             pie.setUsePercentValues(true);
             pie.setDescription("Distance Summary");
-            pie.setDescriptionTextSize(15f);
+            pie.setDescriptionTextSize(25f);
             pie.setCenterText(
-                    String.format("Avg Speed: %d %s%nMax Speed: %d %s",
-                            faverageSpeed, units +"/h", fmaxSpeed, units+"/h"));
-            pie.setCenterTextSize(17f);
+                    String.format("Avg Speed: %s %s%nMax Speed: %s %s",
+                            String.format(l, "%.1f", faverageSpeed), units +"/h",
+                            String.format(l, "%.1f", fmaxSpeed), units+"/h"));
+            pie.setCenterTextSize(15f);
             Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
                     new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
@@ -171,8 +177,30 @@ public class StatsFragment extends Fragment {
             );
             pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
             pieLegend.setForm(Legend.LegendForm.CIRCLE);
-            pieLegend.setTextSize(13f);
+            pieLegend.setTextSize(15f);
             pie.invalidate();
         }
+    }
+
+    private void refreshStats(final View recentView) {
+        Timer speedTimer = new Timer();
+        speedTimer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(lastView == recentView && getActivity() != null)
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showStats(recentView);
+                                }
+                            });
+                        else
+                            ;//cancel();
+
+                    }
+                },
+                0,
+                5000);
     }
 }

@@ -41,7 +41,6 @@ public class MainFragment extends Fragment {
     private TextView speedUnit;
     private TextView mainSpeed;
     private ToggleButton speedToggle;
-    private static boolean toggledOff = true;
     private boolean mBound = false;
     private SpeedService speedService;
 
@@ -80,17 +79,28 @@ public class MainFragment extends Fragment {
         speedUnit = (TextView)view.findViewById(R.id.speedUnit);
 
         speedToggle = (ToggleButton)view.findViewById(R.id.toggleSpeedService);
+        speedToggle.setChecked(SpeedService.serviceOn);
         speedToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(toggledOff)
+                if(speedToggle.isChecked())
                     startSpeedService();
                 else
                     stopSpeedService();
             }
         });
-
-        speedToggle.setChecked(!toggledOff);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        speedToggle.setChecked(SpeedService.serviceOn);
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        speedToggle.setChecked(speedToggle.isChecked());
+        super.onStop();
     }
 
     private void refreshSpeed() {
@@ -136,7 +146,7 @@ public class MainFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
 
-        if(!toggledOff)
+        if(SpeedService.serviceOn)
             _bindService();
     }
 
@@ -166,7 +176,6 @@ public class MainFragment extends Fragment {
         _unbindService();
         getActivity().stopService(new Intent(getActivity(), SpeedService.class));
         speedToggle.setChecked(false);
-        toggledOff = true;
     }
 
     public void startSpeedService() {
@@ -209,7 +218,6 @@ public class MainFragment extends Fragment {
         getActivity().startService(new Intent(getActivity(), SpeedService.class));
         speedToggle.setChecked(true);
         _bindService();
-        toggledOff = false;
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
