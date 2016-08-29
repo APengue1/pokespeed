@@ -39,7 +39,6 @@ public class StatsFragment extends Fragment {
     private static PokeSpeedStats stats;
     private OnFragmentInteractionListener mListener;
     private SharedPreferences prefs;
-    private String units;
 
     public StatsFragment() {
 
@@ -61,7 +60,6 @@ public class StatsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        units = prefs.getBoolean("imperial", false) ? "mi" : "km";
     }
 
     @Override
@@ -120,6 +118,8 @@ public class StatsFragment extends Fragment {
 
     private void showStats(View view) {
         if(stats != null) {
+            String units = prefs.getBoolean("imperial", false) ? "mi" : "km";
+
             double[] statsValues = stats.getStats();
 //            TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
 //            TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
@@ -149,26 +149,29 @@ public class StatsFragment extends Fragment {
                         String.format(l,"%.2f", fdistanceCovered - fDistanceValid) + units));
 
             PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
-            pieSet.setColors(new int[] {Color.BLUE, Color.RED});
+            pieSet.setColors(new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)});
 
             PieData pieData = new PieData(pieSet);
             pieData.setValueFormatter(new PercentFormatter());
             pieData.setValueTextSize(20f);
+            pieData.setValueTextColor(Color.WHITE);
             pie.setData(pieData);
 
             pie.setUsePercentValues(true);
-            pie.setDescription("Distances Summary");
+            pie.setDescription("Distance Summary");
             pie.setDescriptionTextSize(15f);
             pie.setCenterText(
                     String.format("Avg Speed: %d %s%nMax Speed: %d %s",
                             faverageSpeed, units +"/h", fmaxSpeed, units+"/h"));
-            pie.setCenterTextSize(15f);
+            pie.setCenterTextSize(17f);
             Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
-                    new int[] {Color.BLUE, Color.RED},
+                    new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
                     new String[] {"Valid", "Invalid"}
             );
+            pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
             pieLegend.setForm(Legend.LegendForm.CIRCLE);
+            pieLegend.setTextSize(13f);
             pie.invalidate();
         }
     }
