@@ -14,9 +14,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,40 +77,6 @@ public class StatsFragment extends Fragment {
         });        return view;
     }
 
-    private void showStats(View view) {
-        if(stats != null) {
-            double[] statsValues = stats.getStats();
-            TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
-            TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
-            TextView percentDistance = (TextView)view.findViewById(R.id.percentDistance);
-            TextView averageSpeed = (TextView)view.findViewById(R.id.averageSpeed);
-            TextView maxSpeed = (TextView)view.findViewById(R.id.maxSpeed);
-
-            float fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
-            float fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
-            Integer fpercentDistance = Double.valueOf(statsValues[2]*100).intValue();
-            Integer faverageSpeed = Double.valueOf(statsValues[3]).intValue();
-            Integer fmaxSpeed = Double.valueOf(statsValues[4]).intValue();
-
-            Locale l = Locale.getDefault();
-            distanceValid.setText(String.format(l,"%.2f", fDistanceValid));
-            distanceCovered.setText(String.format(l,"%.2f", fdistanceCovered));
-            percentDistance.setText(String.format(l,"%d", fpercentDistance));
-            averageSpeed.setText(String.format(l,"%d", Double.valueOf(faverageSpeed).intValue()));
-            maxSpeed.setText(String.format(l,"%d", fmaxSpeed));
-
-            PieChart pie = (PieChart) view.findViewById(R.id.pieChart);
-            List<PieEntry> pieEntries = new ArrayList<>();
-            pieEntries.add(new PieEntry(fDistanceValid, "Green"));
-            pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid, "Red"));
-            PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
-            pieSet.setColors(new int[] {Color.GREEN, Color.RED});
-            PieData pieData = new PieData(pieSet);
-            pie.setData(pieData);
-            pie.invalidate();
-        }
-    }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -146,5 +114,56 @@ public class StatsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void showStats(View view) {
+        if(stats != null) {
+            double[] statsValues = stats.getStats();
+            TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
+            TextView distanceCovered = (TextView)view.findViewById(R.id.distanceCovered);
+            TextView percentDistance = (TextView)view.findViewById(R.id.percentDistance);
+            TextView averageSpeed = (TextView)view.findViewById(R.id.averageSpeed);
+            TextView maxSpeed = (TextView)view.findViewById(R.id.maxSpeed);
+
+            float fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
+            float fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
+            Integer fpercentDistance = Double.valueOf(statsValues[2]*100).intValue();
+            Integer faverageSpeed = Double.valueOf(statsValues[3]).intValue();
+            Integer fmaxSpeed = Double.valueOf(statsValues[4]).intValue();
+
+            Locale l = Locale.getDefault();
+            distanceValid.setText(String.format(l,"%.2f", fDistanceValid));
+            distanceCovered.setText(String.format(l,"%.2f", fdistanceCovered));
+            percentDistance.setText(String.format(l,"%d", fpercentDistance));
+            averageSpeed.setText(String.format(l,"%d", Double.valueOf(faverageSpeed).intValue()));
+            maxSpeed.setText(String.format(l,"%d", fmaxSpeed));
+
+            PieChart pie = (PieChart) view.findViewById(R.id.pieChart);
+            List<PieEntry> pieEntries = new ArrayList<>();
+            pieEntries.add(new PieEntry(fDistanceValid,
+                    String.format(l,"%.2f", fDistanceValid) + " km"));
+            if(fdistanceCovered - fDistanceValid > 0.001)
+                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
+                        String.format(l,"%.2f", fdistanceCovered - fDistanceValid) + " km"));
+
+            PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
+            pieSet.setColors(new int[] {Color.BLUE, Color.RED});
+
+            PieData pieData = new PieData(pieSet);
+            pieData.setValueFormatter(new PercentFormatter());
+            pieData.setValueTextSize(20f);
+            pie.setData(pieData);
+
+            pie.setUsePercentValues(true);
+            pie.setDescription("Distance Summary");
+            Legend pieLegend = pie.getLegend();
+            pieLegend.setCustom(
+                    new int[] {Color.BLUE, Color.RED},
+                    new String[] {"Valid", "Invalid"}
+            );
+            pieLegend.setForm(Legend.LegendForm.CIRCLE);
+            pie.notifyDataSetChanged();
+            pie.invalidate();
+        }
     }
 }
