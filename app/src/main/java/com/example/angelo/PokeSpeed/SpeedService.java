@@ -50,10 +50,6 @@ public class SpeedService extends Service implements LocationListener{
         lastSpeed = 0;
         lowSpeedCount = 0;
 
-        mBuilder = getDefaultBuilder();
-        addPauseAction(mBuilder);
-        initNotification();
-        requestLocation();
         serviceOn = false;
         super.onCreate();
     }
@@ -141,6 +137,12 @@ public class SpeedService extends Service implements LocationListener{
                 addPauseAction(mBuilder);
                 initNotification();
             }
+        }
+        else {
+            mBuilder = getDefaultBuilder();
+            addPauseAction(mBuilder);
+            initNotification();
+            requestLocation();
         }
         return START_NOT_STICKY;
     }

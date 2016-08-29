@@ -99,7 +99,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onStop() {
-        speedToggle.setChecked(speedToggle.isChecked());
+        speedToggle.setChecked(SpeedService.serviceOn);
         super.onStop();
     }
 
