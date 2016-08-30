@@ -1,16 +1,19 @@
 package com.example.angelo.PokeSpeed;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -36,7 +39,6 @@ import java.util.TimerTask;
  */
 public class StatsFragment extends Fragment {
 
-    private Button btn_stats;
     private static PokeSpeedStats stats;
     private OnFragmentInteractionListener mListener;
     private SharedPreferences prefs;
@@ -71,14 +73,7 @@ public class StatsFragment extends Fragment {
                 R.layout.fragment_stats, container, false);
         stats = MainActivity.stats;
         showStats(view);
-        btn_stats = (Button)view.findViewById(R.id.button_stats);
-        btn_stats.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                showStats(view);
-            }
-        });
         lastView = view;
-        refreshStats(view);
         return view;
     }
 
@@ -106,6 +101,28 @@ public class StatsFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onResume() {
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessagereceiver,
+                new IntentFilter("StatsRefreshed")
+        );
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessagereceiver);
+        super.onPause();
+    }
+
+    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showStats(lastView);
+        }
+    };
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -122,7 +139,11 @@ public class StatsFragment extends Fragment {
     }
 
     private void showStats(View view) {
-        if(stats != null) {
+        PieChart pie = (PieChart) view.findViewById(R.id.pieChart);
+        if(stats == null) {
+            pie.setNoDataText("Turn on PokeSpeed and start moving to see some stats!");
+        }
+        else {
             String units = prefs.getBoolean("imperial", false) ? "mi" : "km";
 
             double[] statsValues = stats.getStats();
@@ -145,13 +166,12 @@ public class StatsFragment extends Fragment {
 //            averageSpeed.setText(String.format(l,"%d", Double.valueOf(faverageSpeed).intValue()));
 //            maxSpeed.setText(String.format(l,"%d", fmaxSpeed));
 
-            PieChart pie = (PieChart) view.findViewById(R.id.pieChart);
             List<PieEntry> pieEntries = new ArrayList<>();
             pieEntries.add(new PieEntry(fDistanceValid,
-                    String.format(l,"%.2f", fDistanceValid) + units));
+                    String.format(l,"%.3f", fDistanceValid) + units));
             if(fdistanceCovered - fDistanceValid > 0.001)
                 pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
-                        String.format(l,"%.2f", fdistanceCovered - fDistanceValid) + units));
+                        String.format(l,"%.3f", fdistanceCovered - fDistanceValid) + units));
 
             PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
             pieSet.setColors(new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)});
@@ -167,8 +187,8 @@ public class StatsFragment extends Fragment {
             pie.setDescriptionTextSize(25f);
             pie.setCenterText(
                     String.format("Avg Speed: %s %s%nMax Speed: %s %s",
-                            String.format(l, "%.1f", faverageSpeed), units +"/h",
-                            String.format(l, "%.1f", fmaxSpeed), units+"/h"));
+                            String.format(l, "%.2f", faverageSpeed), units +"/h",
+                            String.format(l, "%.2f", fmaxSpeed), units+"/h"));
             pie.setCenterTextSize(15f);
             Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
@@ -182,25 +202,25 @@ public class StatsFragment extends Fragment {
         }
     }
 
-    private void refreshStats(final View recentView) {
-        Timer speedTimer = new Timer();
-        speedTimer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(lastView == recentView && getActivity() != null)
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    showStats(recentView);
-                                }
-                            });
-                        else
-                            ;//cancel();
-
-                    }
-                },
-                0,
-                2500);
-    }
+//    private void refreshStats(final View recentView) {
+//        Timer speedTimer = new Timer();
+//        speedTimer.schedule(
+//                new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        if(lastView == recentView && getActivity() != null)
+//                            getActivity().runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    showStats(recentView);
+//                                }
+//                            });
+//                        else
+//                            ;//cancel();
+//
+//                    }
+//                },
+//                0,
+//                2500);
+//    }
 }

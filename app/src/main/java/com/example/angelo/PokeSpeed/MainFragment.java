@@ -23,8 +23,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -101,6 +99,10 @@ public class MainFragment extends Fragment {
                 mMessagereceiver,
                 new IntentFilter("SpeedServiceStop")
         );
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessagereceiver,
+                new IntentFilter("SpeedRefreshed")
+        );
         super.onResume();
     }
 
@@ -119,35 +121,38 @@ public class MainFragment extends Fragment {
     private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            speedToggle.setChecked(SpeedService.serviceOn);
+            if(intent.getBooleanExtra("SpeedServiceStop", false))
+                speedToggle.setChecked(SpeedService.serviceOn);
+            if(intent.getBooleanExtra("SpeedRefreshed", false))
+                mainSpeed.setText(speedService.getLastSpeed());
         }
     };
 
-    private void refreshSpeed() {
-        Timer speedTimer = new Timer();
-        speedTimer.schedule(
-            new TimerTask() {
-                @Override
-                public void run() {
-                if(mBound)
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mainSpeed.setText(speedService.getLastSpeed());
-                            if(prefs.getBoolean("imperial", false))
-                                speedUnit.setText("mph");
-                            else
-                                speedUnit.setText("kmh");
-                        }
-                    });
-                else
-                    cancel();
-
-                }
-            },
-            0,
-            1000);
-    }
+//    private void refreshSpeed() {
+//        Timer speedTimer = new Timer();
+//        speedTimer.schedule(
+//            new TimerTask() {
+//                @Override
+//                public void run() {
+//                if(mBound)
+//                    getActivity().runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mainSpeed.setText(speedService.getLastSpeed());
+//                            if(prefs.getBoolean("imperial", false))
+//                                speedUnit.setText("mph");
+//                            else
+//                                speedUnit.setText("kmh");
+//                        }
+//                    });
+//                else
+//                    cancel();
+//
+//                }
+//            },
+//            0,
+//            1000);
+//    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -246,8 +251,7 @@ public class MainFragment extends Fragment {
             speedService = ((SpeedService.LocalBinder) service).getService();
             MainActivity.stats = speedService.getStatsObj();
             mBound = true;
-            refreshSpeed();
-            //_unbindService();
+            //refreshSpeed();
         }
 
         @Override

@@ -124,7 +124,7 @@ public class SpeedService extends Service implements LocationListener{
                 removeLocation();
                 serviceOn = false;
                 LocalBroadcastManager.getInstance(this).sendBroadcast(
-                        new Intent("SpeedServiceStop")
+                        new Intent("SpeedServiceStop").putExtra("SpeedServiceStop", true)
                 );
                 stopForeground(true);
                 stopSelf();
@@ -192,6 +192,9 @@ public class SpeedService extends Service implements LocationListener{
             else
                 lowSpeedCount = 0;
             stats.giveLocation(location, speed);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(
+                    new Intent("StatsRefreshed")
+            );
 //            } else if (this.lastLocation == null || this.lastTime == null) {
 //                this.lastLocation = location;
 //                this.lastTime = location.getTime(); // ms
@@ -253,6 +256,9 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
         lastSpeed = speedInt;
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
+        );
     }
 
     private int getSpeedForLocale(float i) {
