@@ -1,9 +1,11 @@
 package com.example.angelo.PokeSpeed;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,6 +97,10 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         speedToggle.setChecked(SpeedService.serviceOn);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                mMessagereceiver,
+                new IntentFilter("SpeedServiceStop")
+        );
         super.onResume();
     }
 
@@ -102,6 +109,19 @@ public class MainFragment extends Fragment {
         speedToggle.setChecked(SpeedService.serviceOn);
         super.onStop();
     }
+
+    @Override
+    public void onPause() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessagereceiver);
+        super.onPause();
+    }
+
+    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            speedToggle.setChecked(SpeedService.serviceOn);
+        }
+    };
 
     private void refreshSpeed() {
         Timer speedTimer = new Timer();

@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.LocalBroadcastManager;
 
 
 public class SpeedService extends Service implements LocationListener{
@@ -122,6 +123,9 @@ public class SpeedService extends Service implements LocationListener{
             if (intent.getAction().equals(SpeedService.STOP_SERVICE_ACTION)) {
                 removeLocation();
                 serviceOn = false;
+                LocalBroadcastManager.getInstance(this).sendBroadcast(
+                        new Intent("SpeedServiceStop")
+                );
                 stopForeground(true);
                 stopSelf();
             }

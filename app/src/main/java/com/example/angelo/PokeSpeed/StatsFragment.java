@@ -201,6 +201,6 @@ public class StatsFragment extends Fragment {
                     }
                 },
                 0,
-                5000);
+                2500);
     }
 }
