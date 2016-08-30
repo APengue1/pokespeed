@@ -166,7 +166,7 @@ public class SpeedService extends Service implements LocationListener{
     private void requestLocation() {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    0L,
+                    500L,
                     0F,
                     this);
         }
@@ -188,7 +188,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 14 && location.hasSpeed()) {
+        if(location.getAccuracy() <= 7 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
@@ -245,6 +245,7 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void setSpeed(Float speed) {
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean bVibrate = prefs.getBoolean("vibrate", true);
         String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
         Float fSpeed = getSpeedForLocale(speed);
