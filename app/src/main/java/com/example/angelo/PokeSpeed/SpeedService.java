@@ -252,17 +252,20 @@ public class SpeedService extends Service implements LocationListener{
         String contentText;
         if(fSpeed > SPEED_RED) {
             argb = Color.RED;
+            mBuilder.setSmallIcon(R.drawable.ic_stat_stop);
             contentText = "Difficult to hatch eggs at this speed";
             if(bVibrate)
                 mBuilder.setVibrate(SpeedService.VIBRATE_RED);
         }
         else if(fSpeed > SPEED_YELLOW) {
             argb = getResources().getColor(R.color.colorPokeYellow);
+            mBuilder.setSmallIcon(R.drawable.ic_stat_slow);
             contentText = "Getting close to the speed limit..";
             if(bVibrate)
                 mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
         }
         else {
+            mBuilder.setSmallIcon(R.drawable.ic_pokespeed_notification);
             argb = getResources().getColor(R.color.colorAccent);
             contentText = "Well under the speed limit :)";
             mBuilder.setVibrate(null);
