@@ -94,6 +94,10 @@ public class SpeedService extends Service implements LocationListener{
                 0,
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+        lastSpeed = "Initializing the speed service...";
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
+        );
         return new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_pokespeed_notification)
                 .setContentTitle("PokeSpeed")
@@ -234,6 +238,10 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder.setContentText("Waiting for accurate location...");
         mBuilder.setColor(Color.TRANSPARENT);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
+        lastSpeed = "Waiting for accurate location...";
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
+        );
     }
 
     private void setSpeed(Float speed) {

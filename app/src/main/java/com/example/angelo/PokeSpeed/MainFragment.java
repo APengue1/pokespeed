@@ -85,8 +85,10 @@ public class MainFragment extends Fragment {
             public void onClick(View v) {
                 if(speedToggle.isChecked())
                     startSpeedService();
-                else
+                else {
+                    mainSpeed.setText("");
                     stopSpeedService();
+                }
             }
         });
         return view;

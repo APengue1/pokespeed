@@ -36,9 +36,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="kmh"
         android:id="@+id/speedUnit"
+        android:layout_marginTop="29dp"
         android:layout_alignTop="@+id/mainSpeed"
-        android:layout_toRightOf="@+id/toggleSpeedService"
-        android:layout_toEndOf="@+id/toggleSpeedService" />
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

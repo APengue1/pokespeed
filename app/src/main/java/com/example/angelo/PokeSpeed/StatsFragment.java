@@ -166,7 +166,7 @@ public class StatsFragment extends Fragment {
             List<PieEntry> pieEntries = new ArrayList<>();
             pieEntries.add(new PieEntry(fDistanceValid,
                     String.format(l,"%.3f", fDistanceValid) + units));
-            if(fdistanceCovered - fDistanceValid > 0.001)
+            if(significantDifference(fdistanceCovered, fDistanceValid))
                 pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
                         String.format(l,"%.3f", fdistanceCovered - fDistanceValid) + units));
 
@@ -198,6 +198,10 @@ public class StatsFragment extends Fragment {
             pieLegend.setTextSize(15f);
             pie.invalidate();
         }
+    }
+
+    private boolean significantDifference(Float distanceCovered, float distanceValid) {
+        return distanceCovered - distanceValid > 0.001;
     }
 
 //    private void refreshStats(final View recentView) {
