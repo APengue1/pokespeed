@@ -36,7 +36,7 @@ public class SpeedService extends Service implements LocationListener{
     private static final String PLAY_SERVICE_ACTION = "Play Service Action";
     private final IBinder mBinder = new LocalBinder();
     private PokeSpeedStats stats;
-    private static Integer lastSpeed;
+    private static String lastSpeed;
     private int lowSpeedCount;
     static boolean serviceOn = false;
 
@@ -48,7 +48,7 @@ public class SpeedService extends Service implements LocationListener{
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
-        lastSpeed = 0;
+        lastSpeed = "0.00";
         lowSpeedCount = 0;
 
         serviceOn = false;
@@ -95,8 +95,9 @@ public class SpeedService extends Service implements LocationListener{
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         return new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.poke_speed)
-                .setContentTitle("Pokespeed")
+                .setSmallIcon(R.drawable.ic_pokespeed_notification)
+                .setContentTitle("PokeSpeed")
+                .setContentText("Initializing the speed service...")
                 .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
                 .setContentIntent(resultPendingIntent);
     }
@@ -175,7 +176,7 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     public static String getLastSpeed() {
-        return lastSpeed.toString();
+        return lastSpeed;
     }
 
     @Override
@@ -229,44 +230,50 @@ public class SpeedService extends Service implements LocationListener{
 
     private void setInaccurate() {
         mBuilder.setVibrate(null);
-        mBuilder.setContentTitle("Waiting for accurate location...");
+        mBuilder.setContentTitle("PokeSpeed");
+        mBuilder.setContentText("Waiting for accurate location...");
         mBuilder.setColor(Color.TRANSPARENT);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
     }
 
     private void setSpeed(Float speed) {
         boolean bVibrate = prefs.getBoolean("vibrate", true);
-        Integer speedInt = getSpeedForLocale(speed);
+        String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
+        Float fSpeed = getSpeedForLocale(speed);
         int argb;
-        if(speedInt > SPEED_RED) {
+        String contentText;
+        if(fSpeed > SPEED_RED) {
             argb = Color.RED;
+            contentText = "Difficult to hatch eggs at this speed";
             if(bVibrate)
                 mBuilder.setVibrate(SpeedService.VIBRATE_RED);
         }
-        else if(speedInt > SPEED_YELLOW) {
-            argb = Color.YELLOW;
+        else if(fSpeed > SPEED_YELLOW) {
+            argb = getResources().getColor(R.color.colorPokeYellow);
+            contentText = "Getting close to the speed limit..";
             if(bVibrate)
                 mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
         }
         else {
-            argb = Color.GREEN;
+            argb = getResources().getColor(R.color.colorAccent);
+            contentText = "Well under the speed limit :)";
             mBuilder.setVibrate(null);
         }
-        mBuilder.setContentTitle(speedInt.toString());
+        mBuilder.setContentTitle(String.format("Pokespeed is %.2f %s", fSpeed, unit));
+        mBuilder.setContentText(contentText);
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
-        lastSpeed = speedInt;
+        lastSpeed = String.format("%.2f", fSpeed);
         LocalBroadcastManager.getInstance(this).sendBroadcast(
                 new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
         );
     }
 
-    private int getSpeedForLocale(float i) {
+    private float getSpeedForLocale(float i) {
         boolean bImperial = prefs.getBoolean("imperial", false);
         if(bImperial)
-            return Math.round(i * 0.621371f);
-        else
-            return Math.round(i);
+            i *= 0.621371f;
+        return i;
     }
 
     @Override

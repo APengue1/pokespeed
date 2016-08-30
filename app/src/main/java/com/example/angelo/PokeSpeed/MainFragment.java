@@ -95,6 +95,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         speedToggle.setChecked(SpeedService.serviceOn);
+        if(mBound) mainSpeed.setText(speedService.getLastSpeed());
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessagereceiver,
                 new IntentFilter("SpeedServiceStop")

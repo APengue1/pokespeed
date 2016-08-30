@@ -25,9 +25,6 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -175,6 +172,7 @@ public class StatsFragment extends Fragment {
 
             PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
             pieSet.setColors(new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)});
+            pieSet.setSliceSpace(2);
 
             PieData pieData = new PieData(pieSet);
             pieData.setValueFormatter(new PercentFormatter());
@@ -186,9 +184,9 @@ public class StatsFragment extends Fragment {
             pie.setDescription("Distance Summary");
             pie.setDescriptionTextSize(25f);
             pie.setCenterText(
-                    String.format("Avg Speed: %s %s%nMax Speed: %s %s",
-                            String.format(l, "%.2f", faverageSpeed), units +"/h",
-                            String.format(l, "%.2f", fmaxSpeed), units+"/h"));
+                    String.format("Avg Speed: %.2f %s%nMax Speed: %.2f %s",
+                            faverageSpeed, units +"/h",
+                            fmaxSpeed, units+"/h"));
             pie.setCenterTextSize(15f);
             Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
