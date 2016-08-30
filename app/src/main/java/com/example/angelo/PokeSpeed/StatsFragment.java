@@ -25,6 +25,8 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -71,6 +73,7 @@ public class StatsFragment extends Fragment {
         stats = MainActivity.stats;
         showStats(view);
         lastView = view;
+        refreshStats(view);
         return view;
     }
 
@@ -204,25 +207,26 @@ public class StatsFragment extends Fragment {
         return distanceCovered - distanceValid > 0.001;
     }
 
-//    private void refreshStats(final View recentView) {
-//        Timer speedTimer = new Timer();
-//        speedTimer.schedule(
-//                new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        if(lastView == recentView && getActivity() != null)
-//                            getActivity().runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    showStats(recentView);
-//                                }
-//                            });
-//                        else
-//                            ;//cancel();
-//
-//                    }
-//                },
-//                0,
-//                2500);
-//    }
+    private void refreshStats(final View recentView) {
+        Timer speedTimer = new Timer();
+        speedTimer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        if(lastView == recentView && getActivity() != null)
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showStats(recentView);
+                                    cancel();
+                                }
+                            });
+                        else
+                            cancel();
+                        cancel();
+                    }
+                },
+                0,
+                60000);
+    }
 }
