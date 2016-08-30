@@ -40,6 +40,8 @@ public class SpeedService extends Service implements LocationListener{
     private int lowSpeedCount;
     static boolean serviceOn = false;
 
+    private static final String LOCATION_WAIT = "Waiting for accurate location...";
+
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -94,14 +96,10 @@ public class SpeedService extends Service implements LocationListener{
                 0,
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        lastSpeed = "Initializing the speed service...";
-        LocalBroadcastManager.getInstance(this).sendBroadcast(
-                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
-        );
+        setLastSpeed(LOCATION_WAIT);
         return new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_pokespeed_notification)
                 .setContentTitle("PokeSpeed")
-                .setContentText("Initializing the speed service...")
                 .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
                 .setContentIntent(resultPendingIntent);
     }
@@ -137,18 +135,23 @@ public class SpeedService extends Service implements LocationListener{
             else if(intent.getAction().equals(SpeedService.PAUSE_SERVICE_ACTION)) {
                 removeLocation();
                 mBuilder = getDefaultBuilder();
+                mBuilder.setContentText("Paused");
                 addPlayAction(mBuilder);
+                setLastSpeed("Paused");
                 initNotification();
             }
             else if(intent.getAction().equals(SpeedService.PLAY_SERVICE_ACTION)) {
                 requestLocation();
                 mBuilder = getDefaultBuilder();
+                mBuilder.setContentText(LOCATION_WAIT);
                 addPauseAction(mBuilder);
+                setLastSpeed(LOCATION_WAIT);
                 initNotification();
             }
         }
         else {
             mBuilder = getDefaultBuilder();
+            mBuilder.setContentText(LOCATION_WAIT);
             addPauseAction(mBuilder);
             initNotification();
             requestLocation();
@@ -163,8 +166,8 @@ public class SpeedService extends Service implements LocationListener{
     private void requestLocation() {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    500L,
-                    0.5F,
+                    0L,
+                    0F,
                     this);
         }
         catch(SecurityException e) {
@@ -185,7 +188,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 7 && location.hasSpeed()) {
+        if(location.getAccuracy() <= 14 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
@@ -235,13 +238,10 @@ public class SpeedService extends Service implements LocationListener{
     private void setInaccurate() {
         mBuilder.setVibrate(null);
         mBuilder.setContentTitle("PokeSpeed");
-        mBuilder.setContentText("Waiting for accurate location...");
+        mBuilder.setContentText(LOCATION_WAIT);
         mBuilder.setColor(Color.TRANSPARENT);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
-        lastSpeed = "Waiting for accurate location...";
-        LocalBroadcastManager.getInstance(this).sendBroadcast(
-                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
-        );
+        setLastSpeed(LOCATION_WAIT);
     }
 
     private void setSpeed(Float speed) {
@@ -274,10 +274,7 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder.setContentText(contentText);
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
-        lastSpeed = String.format("%.2f", fSpeed);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(
-                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
-        );
+        setLastSpeed(String.format("%.2f", fSpeed));
     }
 
     private float getSpeedForLocale(float i) {
@@ -293,6 +290,13 @@ public class SpeedService extends Service implements LocationListener{
         serviceOn = false;
         stopSelf();
         super.onDestroy();
+    }
+
+    private void setLastSpeed(String speed) {
+        lastSpeed = speed;
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
+        );
     }
 
 }

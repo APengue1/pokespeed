@@ -190,7 +190,7 @@ public class StatsFragment extends Fragment {
                     String.format("Avg Speed: %.2f %s%nMax Speed: %.2f %s",
                             faverageSpeed, units +"/h",
                             fmaxSpeed, units+"/h"));
-            pie.setCenterTextSize(15f);
+            pie.setCenterTextSize(13f);
             Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
                     new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
