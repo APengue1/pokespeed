@@ -31,32 +31,23 @@
         android:layout_height="wrap_content"
         android:id="@+id/toggleSpeedService"
         android:checked="false"
-        android:layout_marginBottom="30dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:allowUndo="false"
+        android:background="#ffffff" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/mainSpeed"
-        android:layout_alignBaseline="@+id/speedUnit"
-        android:layout_alignBottom="@+id/speedUnit"
-        android:layout_alignLeft="@+id/toggleSpeedService"
-        android:layout_alignStart="@+id/toggleSpeedService" />
+        android:layout_marginTop="51dp"
+        android:text="dfdfdf"
+        android:layout_alignTop="@+id/imageView6"
+        android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:text="   kmh"
-        android:id="@+id/speedUnit"
-        android:layout_marginBottom="24dp"
-        android:layout_above="@+id/toggleSpeedService"
-        android:layout_alignRight="@+id/toggleSpeedService"
-        android:layout_alignEnd="@+id/toggleSpeedService" />
-
-    <ImageView
+        <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/imageView2"
@@ -93,8 +84,7 @@
         android:text="Safely under limit"
         android:id="@+id/textView"
         android:layout_alignTop="@+id/imageView2"
-        android:layout_alignLeft="@+id/mainSpeed"
-        android:layout_alignStart="@+id/mainSpeed" />
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -116,7 +106,17 @@
         android:layout_alignLeft="@+id/textView2"
         android:layout_alignStart="@+id/textView2" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView6"
+            android:src="@drawable/Squirtle_sunglasses"
+            android:layout_marginBottom="31dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/toggleSpeedService"
+            android:layout_toStartOf="@+id/toggleSpeedService" />
 
-</RelativeLayout>
+
+    </RelativeLayout>
 
 </FrameLayout>

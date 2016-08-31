@@ -40,7 +40,7 @@ public class SpeedService extends Service implements LocationListener{
     private int lowSpeedCount;
     static boolean serviceOn = false;
 
-    private static final String LOCATION_WAIT = "Waiting for accurate location...";
+    private static final String LOCATION_WAIT = "Waiting for location...";
 
     @Override
     public void onCreate() {

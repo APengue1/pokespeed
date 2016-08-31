@@ -39,7 +39,6 @@ public class MainFragment extends Fragment {
 
     private SharedPreferences prefs;
 
-    private TextView speedUnit;
     private TextView mainSpeed;
     private ToggleButton speedToggle;
     private boolean mBound = false;
@@ -77,17 +76,19 @@ public class MainFragment extends Fragment {
                 R.layout.fragment_main, container, false);
 
         mainSpeed = (TextView)view.findViewById(R.id.mainSpeed);
-        speedUnit = (TextView)view.findViewById(R.id.speedUnit);
 
         speedToggle = (ToggleButton)view.findViewById(R.id.toggleSpeedService);
-        speedToggle.setChecked(SpeedService.serviceOn);
+        refreshToggle();
         speedToggle.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(speedToggle.isChecked())
+                if(speedToggle.isChecked()) {
                     startSpeedService();
+                    toggleOn();
+                }
                 else {
                     mainSpeed.setText("");
                     stopSpeedService();
+                    toggleOff();
                 }
             }
         });
@@ -96,7 +97,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onResume() {
-        speedToggle.setChecked(SpeedService.serviceOn);
+        refreshToggle();
         if(mBound) mainSpeed.setText(speedService.getLastSpeed());
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessagereceiver,
@@ -111,7 +112,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onStop() {
-        speedToggle.setChecked(SpeedService.serviceOn);
+        refreshToggle();
         super.onStop();
     }
 
@@ -125,7 +126,7 @@ public class MainFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getBooleanExtra("SpeedServiceStop", false))
-                speedToggle.setChecked(SpeedService.serviceOn);
+                refreshToggle();
             if(intent.getBooleanExtra("SpeedRefreshed", false))
                 mainSpeed.setText(speedService.getLastSpeed());
         }
@@ -156,6 +157,23 @@ public class MainFragment extends Fragment {
 //            0,
 //            1000);
 //    }
+
+    private void refreshToggle() {
+        if(SpeedService.serviceOn)
+            toggleOn();
+        else
+            toggleOff();
+    }
+
+    private void toggleOn() {
+        speedToggle.setChecked(true);
+        speedToggle.setBackgroundColor(getResources().getColor(R.color.colorPokeYellow));
+    }
+
+    private void toggleOff() {
+        speedToggle.setChecked(false);
+        speedToggle.setBackgroundColor(getResources().getColor(R.color.white));
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -203,14 +221,14 @@ public class MainFragment extends Fragment {
     public void stopSpeedService() {
         _unbindService();
         getActivity().stopService(new Intent(getActivity(), SpeedService.class));
-        speedToggle.setChecked(false);
+        toggleOff();
     }
 
     public void startSpeedService() {
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            speedToggle.setChecked(false);
+            toggleOff();
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
@@ -244,7 +262,7 @@ public class MainFragment extends Fragment {
 
     private void _startSpeedService() {
         getActivity().startService(new Intent(getActivity(), SpeedService.class));
-        speedToggle.setChecked(true);
+        toggleOn();
         _bindService();
     }
 

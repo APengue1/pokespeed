@@ -3,6 +3,7 @@
     <color name="colorPrimary">#da0000</color>
     <color name="colorPrimaryDark">#C3282E</color>
     <color name="colorAccent">#020CA5</color>
-    <color name="colorPokeYellow">#F8D000</color>
+    <color name="colorPokeYellow">#f8d000</color>
     <color name="colorPokeYellowEndGradient">#FF4E4100</color>
+    <color name="white">#FFFFFF</color>
 </resources>
