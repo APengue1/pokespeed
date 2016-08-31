@@ -65,7 +65,6 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 
     @Override
@@ -98,7 +97,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onResume() {
         refreshToggle();
-        if(mBound) mainSpeed.setText(speedService.getLastSpeed());
+        if(mBound) setMainSpeed();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessagereceiver,
                 new IntentFilter("SpeedServiceStop")
@@ -128,10 +127,22 @@ public class MainFragment extends Fragment {
             if(intent.getBooleanExtra("SpeedServiceStop", false))
                 refreshToggle();
             if(intent.getBooleanExtra("SpeedRefreshed", false))
-                mainSpeed.setText(speedService.getLastSpeed());
+                setMainSpeed();
         }
     };
 
+    private void setMainSpeed() {
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
+        String lastMessage = SpeedService.getLastSpeed();
+        try {
+            Float.parseFloat(lastMessage);
+            mainSpeed.setText(String.format("%s %s", lastMessage, unit));
+        }
+        catch(NumberFormatException e) {
+            mainSpeed.setText(lastMessage);
+        }
+    }
 //    private void refreshSpeed() {
 //        Timer speedTimer = new Timer();
 //        speedTimer.schedule(

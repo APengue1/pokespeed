@@ -42,10 +42,13 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/mainSpeed"
-        android:layout_marginTop="51dp"
-        android:text="dfdfdf"
+        android:layout_marginTop="48dp"
         android:layout_alignTop="@+id/imageView6"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignLeft="@+id/toggleSpeedService"
+        android:layout_alignStart="@+id/toggleSpeedService"
+        android:layout_toStartOf="@+id/toggleSpeedService"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
         <ImageView
         android:layout_width="wrap_content"
@@ -110,11 +113,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView6"
-            android:layout_marginBottom="31dp"
+            android:layout_marginBottom="42dp"
+            android:src="@drawable/squirtle_sunglasses"
+            android:scaleType="fitXY"
             android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/toggleSpeedService"
-            android:layout_toStartOf="@+id/toggleSpeedService"
-            android:src="@drawable/squirtle_sunglasses" />
+            android:layout_toLeftOf="@+id/textView3"
+            android:layout_toStartOf="@+id/textView3" />
 
 
     </RelativeLayout>

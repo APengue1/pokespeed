@@ -188,7 +188,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 20 && location.hasSpeed()) {
+        if(location.getAccuracy() <= 15 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
