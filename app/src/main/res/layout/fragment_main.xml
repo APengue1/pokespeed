@@ -26,9 +26,9 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/mainSpeed"
-        android:layout_above="@+id/toggleSpeedService"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="175dp" />
+        android:layout_alignBaseline="@+id/speedUnit"
+        android:layout_alignBottom="@+id/speedUnit"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,9 +36,95 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="kmh"
         android:id="@+id/speedUnit"
-        android:layout_marginTop="29dp"
-        android:layout_alignTop="@+id/mainSpeed"
-        android:layout_centerHorizontal="true" />
+        android:layout_above="@+id/toggleSpeedService"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="65dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView2"
+        android:layout_marginTop="130dp"
+        android:src="@drawable/ic_action_stop"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/toggleSpeedService"
+        android:layout_toStartOf="@+id/toggleSpeedService"
+        android:layout_marginRight="38dp"
+        android:layout_marginEnd="60dp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView3"
+        android:layout_marginTop="31dp"
+        android:src="@drawable/ic_action_slow"
+        android:layout_below="@+id/imageView2"
+        android:layout_alignLeft="@+id/imageView2"
+        android:layout_alignStart="@+id/imageView2" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView4"
+        android:src="@drawable/ic_action_pokespeed_transparent"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/imageView3"
+        android:layout_alignStart="@+id/imageView3"
+        android:layout_marginTop="31dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:text="Over speed limit (long vibrate)"
+        android:id="@+id/textView"
+        android:layout_alignBottom="@+id/imageView2"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:text="Close to speed limit (short vibrate)"
+        android:id="@+id/textView2"
+        android:layout_above="@+id/imageView4"
+        android:layout_alignRight="@+id/textView4"
+        android:layout_alignEnd="@+id/textView4" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:text="Safely under speed limit"
+        android:id="@+id/textView3"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Look for these notification icons after turning on PokeSpeed"
+        android:id="@+id/textView4"
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="31dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="*Vibration can be toggled under settings"
+        android:id="@+id/textView5"
+        android:layout_below="@+id/textView4"
+        android:layout_alignRight="@+id/textView4"
+        android:layout_alignEnd="@+id/textView4"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 
 </RelativeLayout>
