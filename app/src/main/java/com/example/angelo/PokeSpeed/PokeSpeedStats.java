@@ -12,17 +12,12 @@ public class PokeSpeedStats {
     private int numberRecordings;
     private Location lastLocation;
     private SharedPreferences prefs;
-    private int speedRed;
+    private double speedRed;
 
     public PokeSpeedStats(SharedPreferences _prefs) {
-        distanceCovered = 0;
-        distanceValid = 0;
-        numberRecordings = 0;
-        speedTotal = 0;
-        maxSpeed = 0;
-        lastLocation = null;
         prefs = _prefs;
-        speedRed = Integer.parseInt(prefs.getString("maxSpeed", "11"));
+        speedRed = Double.parseDouble(prefs.getString("maxSpeed", "11"));
+        reset();
     }
 
     public void giveLocation(Location location, Float speed) {
@@ -66,5 +61,14 @@ public class PokeSpeedStats {
                 averageSpeed,
                 _maxSpeed
         };
+    }
+
+    public void reset() {
+        distanceCovered = 0;
+        distanceValid = 0;
+        numberRecordings = 0;
+        speedTotal = 0;
+        maxSpeed = 0;
+        lastLocation = null;
     }
 }

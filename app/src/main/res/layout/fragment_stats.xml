@@ -114,16 +114,30 @@
         android:id="@+id/chartsLinearLayout"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true">
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:weightSum="1">
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="436dp">
 
         </com.github.mikephil.charting.charts.PieChart>
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Reset"
+        android:id="@+id/btn_statsReset"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.18"
+        android:background="@color/colorPokeYellow"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="36dp"
+        android:visibility="visible" />
 
 </RelativeLayout>

@@ -47,7 +47,7 @@ public class SpeedService extends Service implements LocationListener{
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "10.5"));
+        SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", "10.5"));
         SPEED_YELLOW = SPEED_RED - 3;
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -55,7 +55,7 @@ public class SpeedService extends Service implements LocationListener{
         lastSpeed = "0.00";
         lowSpeedCount = 0;
 
-        serviceOn = false;
+        sendServiceStatusChanged(false);
         super.onCreate();
     }
 
@@ -123,14 +123,15 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        serviceOn = true;
+        sendServiceStatusChanged(true);
         if(intent.getAction() != null) {
             if (intent.getAction().equals(SpeedService.STOP_SERVICE_ACTION)) {
                 removeLocation();
-                serviceOn = false;
+                sendServiceStatusChanged(false);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(
                         new Intent("SpeedServiceStop").putExtra("SpeedServiceStop", true)
                 );
+                setLastSpeed("");
                 stopForeground(true);
                 stopSelf();
             }
@@ -300,7 +301,7 @@ public class SpeedService extends Service implements LocationListener{
     @Override
     public void onDestroy() {
         removeLocation();
-        serviceOn = false;
+        sendServiceStatusChanged(false);
         stopSelf();
         super.onDestroy();
     }
@@ -309,6 +310,13 @@ public class SpeedService extends Service implements LocationListener{
         lastSpeed = speed;
         LocalBroadcastManager.getInstance(this).sendBroadcast(
                 new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
+        );
+    }
+
+    private void sendServiceStatusChanged(boolean status) {
+        serviceOn = status;
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent("ServiceStatusChanged").putExtra("status", status)
         );
     }
 
