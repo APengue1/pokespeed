@@ -120,6 +120,7 @@ public class StatsFragment extends Fragment {
                 mMessagereceiver,
                 new IntentFilter("ServiceStatusChanged")
         );
+        showStats(getView(), false);
         super.onResume();
     }
 

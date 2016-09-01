@@ -47,8 +47,8 @@ public class SpeedService extends Service implements LocationListener{
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", "10.5"));
-        SPEED_YELLOW = SPEED_RED - 3;
+        SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", "11"));
+        SPEED_YELLOW = SPEED_RED - 2;
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);
@@ -169,7 +169,7 @@ public class SpeedService extends Service implements LocationListener{
     private void requestLocation() {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    500L,
+                    1000L,
                     0F,
                     this);
         }
@@ -194,7 +194,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 15 && location.hasSpeed()) {
+        if(location.getAccuracy() <= 10 && location.hasSpeed()) {
             Float speed = location.getSpeed(); // m/s
             speed = speed * 60 * 60 / 1000; // km/h
             setSpeed(speed);
@@ -260,35 +260,42 @@ public class SpeedService extends Service implements LocationListener{
     private void setSpeed(Float speed) {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean bVibrate = prefs.getBoolean("vibrate", true);
-        String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
+        String unit = prefs.getBoolean("imperial", false) ? "mi" : "km";
         Double fSpeed = getSpeedForLocale(speed);
         int argb;
         String contentText;
         if(fSpeed >= SPEED_RED) {
             argb = Color.RED;
             mBuilder.setSmallIcon(R.drawable.ic_stat_stop);
-            contentText = "Difficult to hatch eggs at this speed";
+            contentText = "Over speed limit.";
             if(bVibrate)
                 mBuilder.setVibrate(SpeedService.VIBRATE_RED);
         }
         else if(fSpeed >= SPEED_YELLOW) {
             argb = getResources().getColor(R.color.colorPokeYellow);
             mBuilder.setSmallIcon(R.drawable.ic_stat_slow);
-            contentText = "Getting close to the speed limit..";
-            if(bVibrate)
-                mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
+            contentText = "Getting close to limit.";
+//            if(bVibrate)
+//                mBuilder.setVibrate(SpeedService.VIBRATE_YELLOW);
+            mBuilder.setVibrate(null);
         }
         else {
             mBuilder.setSmallIcon(R.drawable.ic_pokespeed_notification);
             argb = getResources().getColor(R.color.colorAccent);
-            contentText = "Well under the speed limit :)";
+            contentText = "Well under limit.";
             mBuilder.setVibrate(null);
         }
-        mBuilder.setContentTitle(String.format("Pokespeed is %.2f %s", fSpeed, unit));
-        mBuilder.setContentText(contentText);
+        mBuilder.setContentTitle(String.format("Pokespeed is %.2f %s", fSpeed, unit + "/h"));
+        mBuilder.setContentText(String.format("%s %s", contentText, distanceSummmary(unit)));
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
         setLastSpeed(String.format("%.2f", fSpeed));
+    }
+
+    private String distanceSummmary(String unit) {
+        String distanceValid = String.format("%.2f", stats.getDistanceValid());
+        String distanceCovered = String.format("%.2f", stats.getDistanceCovered());
+        return String.format("%s/%s %s valid", distanceValid, distanceCovered, unit);
     }
 
     private double getSpeedForLocale(double i) {

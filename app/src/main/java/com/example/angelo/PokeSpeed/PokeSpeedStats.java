@@ -63,6 +63,14 @@ public class PokeSpeedStats {
         };
     }
 
+    public double getDistanceValid() {
+        return distanceValid;
+    }
+
+    public double getDistanceCovered() {
+        return distanceCovered;
+    }
+
     public void reset() {
         distanceCovered = 0;
         distanceValid = 0;
