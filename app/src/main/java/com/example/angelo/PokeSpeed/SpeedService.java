@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -21,7 +22,7 @@ import android.support.v4.content.LocalBroadcastManager;
 public class SpeedService extends Service implements LocationListener{
 
     private SharedPreferences prefs;
-    private int SPEED_RED, SPEED_YELLOW;
+    private double SPEED_RED, SPEED_YELLOW;
 
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
@@ -41,11 +42,12 @@ public class SpeedService extends Service implements LocationListener{
     static boolean serviceOn = false;
 
     private static final String LOCATION_WAIT = "Waiting for location...";
+    private static final String TURN_ON_GPS = "Turn on gps";
 
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "11"));
+        SPEED_RED = Integer.parseInt(prefs.getString("maxSpeed", "10.5"));
         SPEED_YELLOW = SPEED_RED - 3;
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -170,6 +172,9 @@ public class SpeedService extends Service implements LocationListener{
                     0F,
                     this);
         }
+        catch(IllegalArgumentException e) {
+            setLastSpeed(TURN_ON_GPS);
+        }
         catch(SecurityException e) {
         }
     }
@@ -222,17 +227,24 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
-
+        if(s.equals(LocationManager.GPS_PROVIDER) &&
+                (i == LocationProvider.OUT_OF_SERVICE || i == LocationProvider.TEMPORARILY_UNAVAILABLE)) {
+            setLastSpeed(LOCATION_WAIT);
+        }
     }
 
     @Override
     public void onProviderEnabled(String s) {
-
+        if(s.equals(LocationManager.GPS_PROVIDER)) {
+            setLastSpeed(LOCATION_WAIT);
+        }
     }
 
     @Override
     public void onProviderDisabled(String s) {
-
+        if(s.equals(LocationManager.GPS_PROVIDER)) {
+            setLastSpeed(TURN_ON_GPS);
+        }
     }
 
     private void setInaccurate() {
@@ -248,17 +260,17 @@ public class SpeedService extends Service implements LocationListener{
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean bVibrate = prefs.getBoolean("vibrate", true);
         String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
-        Float fSpeed = getSpeedForLocale(speed);
+        Double fSpeed = getSpeedForLocale(speed);
         int argb;
         String contentText;
-        if(fSpeed > SPEED_RED) {
+        if(fSpeed >= SPEED_RED) {
             argb = Color.RED;
             mBuilder.setSmallIcon(R.drawable.ic_stat_stop);
             contentText = "Difficult to hatch eggs at this speed";
             if(bVibrate)
                 mBuilder.setVibrate(SpeedService.VIBRATE_RED);
         }
-        else if(fSpeed > SPEED_YELLOW) {
+        else if(fSpeed >= SPEED_YELLOW) {
             argb = getResources().getColor(R.color.colorPokeYellow);
             mBuilder.setSmallIcon(R.drawable.ic_stat_slow);
             contentText = "Getting close to the speed limit..";
@@ -278,7 +290,7 @@ public class SpeedService extends Service implements LocationListener{
         setLastSpeed(String.format("%.2f", fSpeed));
     }
 
-    private float getSpeedForLocale(float i) {
+    private double getSpeedForLocale(double i) {
         boolean bImperial = prefs.getBoolean("imperial", false);
         if(bImperial)
             i *= 0.621371f;
