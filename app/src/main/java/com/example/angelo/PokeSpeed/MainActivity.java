@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements
     private final StatsFragment statsFragment = StatsFragment.newInstance();
     private final FragmentManager mFragment = getSupportFragmentManager();
     static PokeSpeedStats stats = null;
+    static Boolean permissionGranted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
+        permissionGranted = false;
     }
 
     @Override
@@ -125,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults.length > 0 && grantResults[0] != -1) {
+            permissionGranted = true;
             mainFragment.startSpeedService();
         }
     }

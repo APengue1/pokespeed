@@ -96,7 +96,12 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onResume() {
-        refreshToggle();
+        if(MainActivity.permissionGranted != null && MainActivity.permissionGranted) {
+            MainActivity.permissionGranted = null;
+            toggleOn();
+        }
+        else
+            refreshToggle();
         if(mBound) setMainSpeed();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
                 mMessagereceiver,
@@ -132,15 +137,16 @@ public class MainFragment extends Fragment {
     };
 
     private void setMainSpeed() {
-        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
         String lastMessage = SpeedService.getLastSpeed();
-        try {
-            Float.parseFloat(lastMessage);
-            mainSpeed.setText(String.format("%s %s", lastMessage, unit));
-        }
-        catch(NumberFormatException e) {
-            mainSpeed.setText(lastMessage);
+        if(lastMessage != null) {
+            prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
+            try {
+                Float.parseFloat(lastMessage);
+                mainSpeed.setText(String.format("%s %s", lastMessage, unit));
+            } catch (NumberFormatException e) {
+                mainSpeed.setText(lastMessage);
+            }
         }
     }
 //    private void refreshSpeed() {
