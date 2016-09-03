@@ -103,6 +103,7 @@ public class SpeedService extends Service implements LocationListener{
                 .setSmallIcon(R.drawable.ic_pokespeed_notification)
                 .setContentTitle("PokeSpeed")
                 .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(resultPendingIntent);
     }
 
