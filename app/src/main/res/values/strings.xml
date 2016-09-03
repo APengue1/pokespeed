@@ -1,14 +1,14 @@
 <resources>
-    <string name="app_name">PokeSpeed</string>
+    <string name="app_name">GO Speed</string>
     <string name="title_activity_stats">Stats</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_main2">PokeSpeed</string>
-    <string name="feedbackEmail">pokespeed1@gmail.com</string>
-    <string name="feedbackSubject">PokeSpeed Feedback</string>
+    <string name="title_activity_main2">GO Speed</string>
+    <string name="feedbackEmail">speedpokemongo@gmail.com</string>
+    <string name="feedbackSubject">GO Speed Feedback</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

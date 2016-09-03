@@ -101,7 +101,7 @@ public class SpeedService extends Service implements LocationListener{
         setLastSpeed(LOCATION_WAIT);
         return new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_pokespeed_notification)
-                .setContentTitle("PokeSpeed")
+                .setContentTitle("GO Speed")
                 .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(resultPendingIntent);
@@ -251,7 +251,7 @@ public class SpeedService extends Service implements LocationListener{
 
     private void setInaccurate() {
         mBuilder.setVibrate(null);
-        mBuilder.setContentTitle("PokeSpeed");
+        mBuilder.setContentTitle("GO Speed");
         mBuilder.setContentText(LOCATION_WAIT);
         mBuilder.setColor(Color.TRANSPARENT);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
@@ -286,7 +286,7 @@ public class SpeedService extends Service implements LocationListener{
             contentText = "Well under limit.";
             mBuilder.setVibrate(null);
         }
-        mBuilder.setContentTitle(String.format("Pokespeed is %.2f %s", fSpeed, unit + "/h"));
+        mBuilder.setContentTitle(String.format("GO speed is %.2f %s", fSpeed, unit + "/h"));
         mBuilder.setContentText(String.format("%s %s", contentText, distanceSummmary(unit)));
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());

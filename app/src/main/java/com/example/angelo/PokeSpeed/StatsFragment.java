@@ -170,7 +170,7 @@ public class StatsFragment extends Fragment {
             float fmaxSpeed = 0;
 
             if (stats != null && !reset) {
-                pie.setNoDataText("Turn on PokeSpeed and start moving to see some stats!");
+                pie.setNoDataText("Turn on GO Speed and start moving to see some stats!");
                 double[] statsValues = stats.getStats();
                 fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
                 fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
