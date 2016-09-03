@@ -48,7 +48,7 @@ public class SpeedService extends Service implements LocationListener{
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", "11"));
-        SPEED_YELLOW = SPEED_RED - 2;
+        SPEED_YELLOW = SPEED_RED - 1.5;
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         notificationManager = NotificationManagerCompat.from(this);

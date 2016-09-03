@@ -7,17 +7,17 @@
    <SwitchPreference
        android:summaryOn="Imperial Units"
        android:summaryOff="Imperial Units"
-       android:key="imperial"
-       >
-   </SwitchPreference>
+       android:defaultValue="false"
+       android:key="imperial" />
    <SwitchPreference
        android:summaryOn="Vibrate"
        android:summaryOff="Vibrate"
-       android:key="vibrate">
-   </SwitchPreference>
+       android:defaultValue="true"
+       android:key="vibrate" />
+    <!--
    <EditTextPreference
        android:key="maxSpeed"
-       android:defaultValue="17">
-   </EditTextPreference>
+       android:defaultValue="2" />
+   -->
 
 </PreferenceScreen>

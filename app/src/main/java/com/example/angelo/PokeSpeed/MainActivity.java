@@ -1,8 +1,10 @@
 package com.example.angelo.PokeSpeed;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -26,6 +28,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if(!prefs.getBoolean("firstInit", false)) {
+            prefs.edit()
+                .putBoolean("vibrate", true)
+                .putBoolean("imperial", false)
+                .putBoolean("firstInit", true)
+                .commit();
+        }
+        PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, true);
         setContentView(R.layout.activity_main);
         mFragment.beginTransaction().replace(
                 R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
