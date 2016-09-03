@@ -24,11 +24,12 @@ public class MainActivity extends AppCompatActivity implements
     private final FragmentManager mFragment = getSupportFragmentManager();
     static PokeSpeedStats stats = null;
     static Boolean permissionGranted;
+    static SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if(!prefs.getBoolean("firstInit", false)) {
             prefs.edit()
                 .putBoolean("vibrate", true)

@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -64,6 +63,7 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        prefs = MainActivity.prefs;
         super.onCreate(savedInstanceState);
     }
 
@@ -137,15 +137,17 @@ public class MainFragment extends Fragment {
     };
 
     private void setMainSpeed() {
-        String lastMessage = SpeedService.getLastSpeed();
-        if(lastMessage != null) {
-            prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
-            try {
-                Float.parseFloat(lastMessage);
-                mainSpeed.setText(String.format("%s %s", lastMessage, unit));
-            } catch (NumberFormatException e) {
-                mainSpeed.setText(lastMessage);
+        if(isAdded()) {
+            String lastMessage = SpeedService.getLastSpeed();
+            if (lastMessage != null) {
+                //prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
+                try {
+                    Float.parseFloat(lastMessage);
+                    mainSpeed.setText(String.format("%s %s", lastMessage, unit));
+                } catch (NumberFormatException e) {
+                    mainSpeed.setText(lastMessage);
+                }
             }
         }
     }
@@ -183,13 +185,17 @@ public class MainFragment extends Fragment {
     }
 
     private void toggleOn() {
-        speedToggle.setChecked(true);
-        speedToggle.setBackgroundColor(getResources().getColor(R.color.colorPokeYellow));
+        if(isAdded()) {
+            speedToggle.setChecked(true);
+            speedToggle.setBackgroundColor(getResources().getColor(R.color.colorPokeYellow));
+        }
     }
 
     private void toggleOff() {
-        speedToggle.setChecked(false);
-        speedToggle.setBackgroundColor(getResources().getColor(R.color.white));
+        if(isAdded()) {
+            speedToggle.setChecked(false);
+            speedToggle.setBackgroundColor(getResources().getColor(R.color.white));
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

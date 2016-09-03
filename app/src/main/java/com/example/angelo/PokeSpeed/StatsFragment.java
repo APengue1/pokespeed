@@ -160,24 +160,25 @@ public class StatsFragment extends Fragment {
     }
 
     private void showStats(View view, boolean reset) {
-        PieChart pie = (PieChart) view.findViewById(R.id.pieChart);
+        if(isAdded()) {
+            PieChart pie = (PieChart) view.findViewById(R.id.pieChart);
 
-        float fDistanceValid = 0;
-        float fdistanceCovered = 0;
-        Integer fpercentDistance = 0;
-        float faverageSpeed = 0;
-        float fmaxSpeed = 0;
+            float fDistanceValid = 0;
+            float fdistanceCovered = 0;
+            Integer fpercentDistance = 0;
+            float faverageSpeed = 0;
+            float fmaxSpeed = 0;
 
-        if(stats != null && !reset) {
-            pie.setNoDataText("Turn on PokeSpeed and start moving to see some stats!");
-            double[] statsValues = stats.getStats();
-            fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
-            fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
-            fpercentDistance = Double.valueOf(statsValues[2]*100).intValue();
-            faverageSpeed = Double.valueOf(statsValues[3]).floatValue();
-            fmaxSpeed = Double.valueOf(statsValues[4]).floatValue();
-        }
-        String units = prefs.getBoolean("imperial", false) ? "mi" : "km";
+            if (stats != null && !reset) {
+                pie.setNoDataText("Turn on PokeSpeed and start moving to see some stats!");
+                double[] statsValues = stats.getStats();
+                fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
+                fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
+                fpercentDistance = Double.valueOf(statsValues[2] * 100).intValue();
+                faverageSpeed = Double.valueOf(statsValues[3]).floatValue();
+                fmaxSpeed = Double.valueOf(statsValues[4]).floatValue();
+            }
+            String units = prefs.getBoolean("imperial", false) ? "mi" : "km";
 
 //        double[] statsValues = stats.getStats();
 //            TextView distanceValid = (TextView)view.findViewById(R.id.validDistance);
@@ -187,49 +188,49 @@ public class StatsFragment extends Fragment {
 //            TextView maxSpeed = (TextView)view.findViewById(R.id.maxSpeed);
 
 
-
-        Locale l = Locale.getDefault();
+            Locale l = Locale.getDefault();
 //            distanceValid.setText(String.format(l,"%.2f", fDistanceValid));
 //            distanceCovered.setText(String.format(l,"%.2f", fdistanceCovered));
 //            percentDistance.setText(String.format(l,"%d", fpercentDistance));
 //            averageSpeed.setText(String.format(l,"%d", Double.valueOf(faverageSpeed).intValue()));
 //            maxSpeed.setText(String.format(l,"%d", fmaxSpeed));
 
-        List<PieEntry> pieEntries = new ArrayList<>();
-        pieEntries.add(new PieEntry(fDistanceValid,
-                String.format(l,"%.3f", fDistanceValid) + units));
-        if(significantDifference(fdistanceCovered, fDistanceValid))
-            pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
-                    String.format(l,"%.3f", fdistanceCovered - fDistanceValid) + units));
+            List<PieEntry> pieEntries = new ArrayList<>();
+            pieEntries.add(new PieEntry(fDistanceValid,
+                    String.format(l, "%.3f", fDistanceValid) + units));
+            if (significantDifference(fdistanceCovered, fDistanceValid))
+                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
+                        String.format(l, "%.3f", fdistanceCovered - fDistanceValid) + units));
 
-        PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
-        pieSet.setColors(new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)});
-        pieSet.setSliceSpace(2);
+            PieDataSet pieSet = new PieDataSet(pieEntries, "Distances");
+            pieSet.setColors(new int[]{getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)});
+            pieSet.setSliceSpace(2);
 
-        PieData pieData = new PieData(pieSet);
-        pieData.setValueFormatter(new PercentFormatter());
-        pieData.setValueTextSize(20f);
-        pieData.setValueTextColor(Color.WHITE);
-        pie.setData(pieData);
+            PieData pieData = new PieData(pieSet);
+            pieData.setValueFormatter(new PercentFormatter());
+            pieData.setValueTextSize(20f);
+            pieData.setValueTextColor(Color.WHITE);
+            pie.setData(pieData);
 
-        pie.setUsePercentValues(true);
-        pie.setDescription("Distance Summary");
-        pie.setDescriptionTextSize(25f);
-        pie.setCenterText(
-                String.format("Avg Speed: %.2f %s%nMax Speed: %.2f %s",
-                        faverageSpeed, units +"/h",
-                        fmaxSpeed, units+"/h"));
-        pie.setCenterTextSize(15f);
-        pie.setHoleRadius(55);
-        Legend pieLegend = pie.getLegend();
-        pieLegend.setCustom(
-                new int[] {getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
-                new String[] {"Valid", "Invalid"}
-        );
-        pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
-        pieLegend.setForm(Legend.LegendForm.CIRCLE);
-        pieLegend.setTextSize(15f);
-        pie.invalidate();
+            pie.setUsePercentValues(true);
+            pie.setDescription("Distance Summary");
+            pie.setDescriptionTextSize(25f);
+            pie.setCenterText(
+                    String.format("Avg Speed: %.2f %s%nMax Speed: %.2f %s",
+                            faverageSpeed, units + "/h",
+                            fmaxSpeed, units + "/h"));
+            pie.setCenterTextSize(15f);
+            pie.setHoleRadius(55);
+            Legend pieLegend = pie.getLegend();
+            pieLegend.setCustom(
+                    new int[]{getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
+                    new String[]{"Valid", "Invalid"}
+            );
+            pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
+            pieLegend.setForm(Legend.LegendForm.CIRCLE);
+            pieLegend.setTextSize(15f);
+            pie.invalidate();
+        }
     }
 
     private boolean significantDifference(Float distanceCovered, float distanceValid) {
@@ -262,7 +263,8 @@ public class StatsFragment extends Fragment {
     private void resetStats(View v) {
         if(stats != null)
             stats.reset();
-        showStats(getView(), true);
+        if(isAdded())
+            showStats(getView(), true);
     }
 
     private void showResetButton(boolean show) {
