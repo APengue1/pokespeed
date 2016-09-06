@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
@@ -145,6 +146,10 @@ public class MainFragment extends Fragment {
                 try {
                     Float.parseFloat(lastMessage);
                     mainSpeed.setText(String.format("%s %s", lastMessage, unit));
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            "Look for GO Speed in your notifications",
+                            Toast.LENGTH_LONG)
+                            .show();
                 } catch (NumberFormatException e) {
                     mainSpeed.setText(lastMessage);
                 }
