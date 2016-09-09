@@ -146,10 +146,6 @@ public class MainFragment extends Fragment {
                 try {
                     Float.parseFloat(lastMessage);
                     mainSpeed.setText(String.format("%s %s", lastMessage, unit));
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            "Look for GO Speed in your notifications",
-                            Toast.LENGTH_LONG)
-                            .show();
                 } catch (NumberFormatException e) {
                     mainSpeed.setText(lastMessage);
                 }
@@ -292,6 +288,14 @@ public class MainFragment extends Fragment {
         getActivity().startService(new Intent(getActivity(), SpeedService.class));
         toggleOn();
         _bindService();
+        Toast.makeText(getActivity().getApplicationContext(),
+                "Go Outdoors",
+                Toast.LENGTH_LONG)
+                .show();
+        Toast.makeText(getActivity().getApplicationContext(),
+                "Look for GO Speed in your notifications",
+                Toast.LENGTH_SHORT)
+                .show();
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

@@ -26,10 +26,10 @@ public class SpeedService extends Service implements LocationListener{
 
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
-    //private Location lastLocation;
-    //private Long lastTime;
+    private Location lastLocation;
+    private Long lastTime;
     private NotificationManagerCompat notificationManager;
-    private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
+    //private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
     private static final long[] VIBRATE_RED = new long[]{500, 500};
     private static final int NOTIFY_ID = 1;
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
@@ -41,8 +41,11 @@ public class SpeedService extends Service implements LocationListener{
     private int lowSpeedCount;
     static boolean serviceOn = false;
 
-    private static final String LOCATION_WAIT = "Waiting for location...";
+    private static final String LOCATION_WAIT = "0.00";
     private static final String TURN_ON_GPS = "Turn on gps";
+    private static final int MIN_ACCURACY = 50;
+    private static final long MIN_TIME_FAST = 0;
+    private static final long MIN_TIME_DEFAULT = 1500;
 
     @Override
     public void onCreate() {
@@ -142,10 +145,10 @@ public class SpeedService extends Service implements LocationListener{
                 mBuilder.setContentText("Paused");
                 addPlayAction(mBuilder);
                 setLastSpeed("Paused");
-                initNotification();
+                notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
             }
             else if(intent.getAction().equals(SpeedService.PLAY_SERVICE_ACTION)) {
-                requestLocation();
+                requestLocation(MIN_TIME_FAST);
                 mBuilder = getDefaultBuilder();
                 mBuilder.setContentText(LOCATION_WAIT);
                 addPauseAction(mBuilder);
@@ -158,19 +161,20 @@ public class SpeedService extends Service implements LocationListener{
             mBuilder.setContentText(LOCATION_WAIT);
             addPauseAction(mBuilder);
             initNotification();
-            requestLocation();
+            requestLocation(MIN_TIME_FAST);
         }
         return START_NOT_STICKY;
     }
 
     private void initNotification() {
         startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
+        setSpeed(0F);
     }
 
-    private void requestLocation() {
+    private void requestLocation(long minTime) {
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    1000L,
+                    minTime,
                     0F,
                     this);
         }
@@ -195,35 +199,45 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() <= 10 && location.hasSpeed()) {
-            Float speed = location.getSpeed(); // m/s
-            speed = speed * 60 * 60 / 1000; // km/h
-            setSpeed(speed);
-            if(speed < 0.5)
-                if(lowSpeedCount >= 2)
-                    return;
+        if(location.getAccuracy() <= SpeedService.MIN_ACCURACY) {
+            Float speed;
+            if(location.hasSpeed()) {
+                speed = location.getSpeed(); // m/s
+                speed = speed * 60 * 60 / 1000; // km/h
+                setSpeed(speed);
+                if (speed < 0.5)
+                    if (lowSpeedCount >= 2)
+                        return;
+                    else
+                        lowSpeedCount++;
                 else
-                    lowSpeedCount++;
-            else
-                lowSpeedCount = 0;
-            stats.giveLocation(location, speed);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(
-                    new Intent("StatsRefreshed")
-            );
-//            } else if (this.lastLocation == null || this.lastTime == null) {
-//                this.lastLocation = location;
-//                this.lastTime = location.getTime(); // ms
-//            } else {
-//                float distanceCovered = location.distanceTo(this.lastLocation); // m
-//                long timeElapsed = location.getTime() - this.lastTime; //ms
-//                this.lastLocation = location;
-//                this.lastTime = location.getTime();
-//                speed = distanceCovered / timeElapsed; // m/ms
-//                speed = speed * 60 * 60 * 60 / 1000; // km/h
-//                setSpeed(speed);
+                    lowSpeedCount = 0;
+                stats.giveLocation(location, speed);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(
+                        new Intent("StatsRefreshed")
+                );
+            }
+            else if (this.lastLocation == null || this.lastTime == null) {
+                this.lastLocation = location;
+                this.lastTime = location.getTime(); // ms
+            }
+            else {
+                float distanceCovered = location.distanceTo(this.lastLocation); // m
+                long timeElapsed = location.getTime() - this.lastTime; //ms
+                this.lastLocation = location;
+                this.lastTime = location.getTime();
+                speed = distanceCovered / timeElapsed; // m/ms
+                speed = speed * 60 * 60 * 60 / 1000; // km/h
+                setSpeed(speed);
+                stats.giveLocation(location, speed);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(
+                        new Intent("StatsRefreshed")
+                );
+            }
+            requestLocation(SpeedService.MIN_TIME_DEFAULT);
         }
         else {
-            setInaccurate();
+            requestLocation(SpeedService.MIN_TIME_FAST);
         }
     }
 
@@ -249,14 +263,14 @@ public class SpeedService extends Service implements LocationListener{
         }
     }
 
-    private void setInaccurate() {
-        mBuilder.setVibrate(null);
-        mBuilder.setContentTitle("GO Speed");
-        mBuilder.setContentText(LOCATION_WAIT);
-        mBuilder.setColor(Color.TRANSPARENT);
-        notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
-        setLastSpeed(LOCATION_WAIT);
-    }
+//    private void setInaccurate() {
+//        mBuilder.setVibrate(null);
+//        mBuilder.setContentTitle("GO Speed");
+//        mBuilder.setContentText(LOCATION_WAIT);
+//        mBuilder.setColor(Color.TRANSPARENT);
+//        notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
+//        setLastSpeed(LOCATION_WAIT);
+//    }
 
     private void setSpeed(Float speed) {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
