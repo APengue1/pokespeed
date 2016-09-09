@@ -289,7 +289,7 @@ public class MainFragment extends Fragment {
         toggleOn();
         _bindService();
         Toast.makeText(getActivity().getApplicationContext(),
-                "Go Outdoors",
+                "Go Outdoors!",
                 Toast.LENGTH_LONG)
                 .show();
         Toast.makeText(getActivity().getApplicationContext(),
