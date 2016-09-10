@@ -47,6 +47,8 @@ public class SpeedService extends Service implements LocationListener{
     private static final long MIN_TIME_FAST = 0;
     private static final long MIN_TIME_DEFAULT = 1500;
 
+    private static boolean requestGpsFast, requestGpsDefault;
+
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -57,6 +59,8 @@ public class SpeedService extends Service implements LocationListener{
         notificationManager = NotificationManagerCompat.from(this);
         lastSpeed = "0.00";
         lowSpeedCount = 0;
+        requestGpsFast = false;
+        requestGpsDefault = false;
 
         sendServiceStatusChanged(false);
         super.onCreate();
@@ -172,6 +176,19 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void requestLocation(long minTime) {
+        if((minTime == SpeedService.MIN_TIME_FAST && SpeedService.requestGpsFast) ||
+                (minTime == SpeedService.MIN_TIME_DEFAULT && SpeedService.requestGpsDefault)) {
+            return;
+        }
+
+        if(minTime == SpeedService.MIN_TIME_FAST) {
+            SpeedService.requestGpsFast = true;
+            SpeedService.requestGpsDefault = false;
+        }
+        else if (minTime == SpeedService.MIN_TIME_DEFAULT) {
+            SpeedService.requestGpsFast = false;
+            SpeedService.requestGpsDefault = true;
+        }
         try {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     minTime,
@@ -186,6 +203,8 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void removeLocation() {
+        SpeedService.requestGpsDefault = false;
+        SpeedService.requestGpsFast = false;
         try {
             locationManager.removeUpdates(this);
         }

@@ -112,12 +112,37 @@ public class MainActivity extends AppCompatActivity implements
                     R.id.layout_main, statsFragment, statsFragment.getTag()).commit();
         }  else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
-        } else if (id == R.id.nav_feedback) {
+        }
+        else if(id == R.id.nav_rate) {
+            giveRating();
+        }
+        else if (id == R.id.nav_feedback) {
             sendFeedbackEmail();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void giveRating() {
+        Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());
+        Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, uri);
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        playStoreIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        if(playStoreIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(playStoreIntent);
+        }
+        else {
+            startActivity(
+                new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" +
+                            getApplicationContext().getPackageName())));
+        }
     }
 
     private void sendFeedbackEmail() {
