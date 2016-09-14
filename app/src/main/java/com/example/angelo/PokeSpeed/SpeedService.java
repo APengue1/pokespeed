@@ -43,7 +43,7 @@ public class SpeedService extends Service implements LocationListener{
 
     private static final String LOCATION_WAIT = "0.00";
     private static final String TURN_ON_GPS = "Turn on gps";
-    private static final int MIN_ACCURACY = 20;
+    private static final int MIN_ACCURACY = 15;
     private static final long MIN_TIME_FAST = 0;
     private static final long MIN_TIME_DEFAULT = 1000;
 
