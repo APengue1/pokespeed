@@ -113,6 +113,9 @@ public class MainActivity extends AppCompatActivity implements
         }  else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }
+        else if(id == R.id.nav_share) {
+            shareApp();
+        }
         else if(id == R.id.nav_rate) {
             giveRating();
         }
@@ -122,6 +125,27 @@ public class MainActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void shareApp() {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                "Speed for Pokemon GO: speed monitoring for Pokemon Go egg hatchers! "+
+                        "Hatch eggs efficiently by staying under the egg hatch speed limit! "  +
+                        "Get it on Google Play: " +
+                        "https://play.google.com/store/apps/details?id=com.apengue.PokeSpeed");
+        shareIntent.setType("text/plain");
+        if(shareIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(shareIntent);
+        }
+        else {
+            startActivity(
+                    new Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" +
+                                    getApplicationContext().getPackageName())));
+        }
     }
 
     private void giveRating() {
