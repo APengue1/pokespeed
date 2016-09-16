@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId 'com.apengue.PokeSpeed'
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 22
         versionCode 8
         versionName '1.0.8'
     }
