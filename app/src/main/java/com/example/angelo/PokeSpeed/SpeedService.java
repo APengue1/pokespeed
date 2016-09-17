@@ -142,7 +142,7 @@ public class SpeedService extends Service implements LocationListener{
                 );
                 setLastSpeed("");
                 stopForeground(true);
-                stopService(new Intent(this, SpeedOverlayService.class));
+                stopOverlayService();
                 stopSelf();
             }
             else if(intent.getAction().equals(SpeedService.PAUSE_SERVICE_ACTION)) {
@@ -168,7 +168,7 @@ public class SpeedService extends Service implements LocationListener{
             addPauseAction(mBuilder);
             initNotification();
             requestLocation(MIN_TIME_FAST);
-            startService(new Intent(this, SpeedOverlayService.class));
+            startOverlayService();
         }
         return START_NOT_STICKY;
     }
@@ -362,6 +362,15 @@ public class SpeedService extends Service implements LocationListener{
         LocalBroadcastManager.getInstance(this).sendBroadcast(
                 new Intent("ServiceStatusChanged").putExtra("status", status)
         );
+    }
+
+    private void stopOverlayService() {
+        Intent stop = new Intent(this, SpeedOverlayService.class);
+        stop.setAction("stop");
+        startService(stop);
+    }
+    private void startOverlayService() {
+        startService(new Intent(this, SpeedOverlayService.class));
     }
 
 }

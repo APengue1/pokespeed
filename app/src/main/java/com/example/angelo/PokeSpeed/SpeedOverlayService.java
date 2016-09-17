@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -88,9 +89,14 @@ public class SpeedOverlayService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        if(intent.getAction() != null && intent.getAction().equals("stop")) {
+            wm.removeViewImmediate(speedOverlay);
+            stopSelf();
+        }
         return START_NOT_STICKY;
     }
+
+
 
     private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
         @Override
@@ -109,7 +115,6 @@ public class SpeedOverlayService extends Service {
     @Override
     public void onDestroy() {
         stopSelf();
-        wm.removeView(speedOverlay);
         super.onDestroy();
     }
 
@@ -174,7 +179,7 @@ public class SpeedOverlayService extends Service {
             pieLegend.setForm(Legend.LegendForm.CIRCLE);
             pieLegend.setTextSize(15f);
             speedOverlay.invalidate();
+            wm.updateViewLayout(speedOverlay, params);
         }
-        wm.updateViewLayout(speedOverlay, params);
     }
 }
