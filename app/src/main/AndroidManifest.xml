@@ -13,17 +13,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name="com.example.angelo.PokeSpeed.SpeedService"
+            android:name=".SpeedService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name="com.example.angelo.PokeSpeed.MainActivity"
+            android:name=".MainActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_main2"
             android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,8 +31,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.angelo.PokeSpeed.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+
+        <service
+            android:name=".SpeedOverlayService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

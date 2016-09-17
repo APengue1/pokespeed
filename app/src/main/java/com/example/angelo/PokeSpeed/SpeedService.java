@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.WindowManager;
 
 
 public class SpeedService extends Service implements LocationListener{
@@ -141,6 +142,7 @@ public class SpeedService extends Service implements LocationListener{
                 );
                 setLastSpeed("");
                 stopForeground(true);
+                stopService(new Intent(this, SpeedOverlayService.class));
                 stopSelf();
             }
             else if(intent.getAction().equals(SpeedService.PAUSE_SERVICE_ACTION)) {
@@ -166,6 +168,7 @@ public class SpeedService extends Service implements LocationListener{
             addPauseAction(mBuilder);
             initNotification();
             requestLocation(MIN_TIME_FAST);
+            startService(new Intent(this, SpeedOverlayService.class));
         }
         return START_NOT_STICKY;
     }
