@@ -233,7 +233,7 @@ public class StatsFragment extends Fragment {
         }
     }
 
-    private boolean significantDifference(Float distanceCovered, float distanceValid) {
+    static boolean significantDifference(Float distanceCovered, float distanceValid) {
         return distanceCovered - distanceValid > 0.001;
     }
 
