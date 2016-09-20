@@ -14,6 +14,11 @@
        android:summaryOff="Vibrate"
        android:defaultValue="true"
        android:key="vibrate" />
+   <SwitchPreference
+       android:summaryOn="Speed Overlay"
+       android:summaryOff="Speed Overlay"
+       android:defaultValue="true"
+       android:key="speedOverlay" />
     <!--
    <EditTextPreference
        android:key="maxSpeed"

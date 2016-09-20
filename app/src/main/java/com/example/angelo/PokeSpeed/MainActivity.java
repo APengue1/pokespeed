@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements
             prefs.edit()
                 .putBoolean("vibrate", true)
                 .putBoolean("imperial", false)
+                .putBoolean("speedOverlay", true)
                 .putBoolean("firstInit", true)
                 .commit();
         }

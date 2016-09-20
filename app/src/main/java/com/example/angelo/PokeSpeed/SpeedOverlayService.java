@@ -58,9 +58,9 @@ public class SpeedOverlayService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.TOP | Gravity.CENTER_VERTICAL;
-        params.x = 500;
-        params.y = 1500;
+        params.gravity = Gravity.START;
+        //params.x = 0;
+        params.y = 100;
 
         overlayView = LayoutInflater.from(getApplicationContext())
                 .inflate(R.layout.speed_overlay, null);
@@ -196,6 +196,7 @@ public class SpeedOverlayService extends Service {
                 else if(dSpeed >= SpeedService.SPEED_YELLOW) {
                     //centerColor.setColor(getResources().getColor(R.color.colorPokeYellow));
                     speedChart.setHoleColor(getResources().getColor(R.color.colorPokeYellow));
+                    speedChart.setCenterTextColor(Color.BLACK);
                 }
                 else {
                     //centerColor.setColor(getResources().getColor(R.color.colorAccent));
@@ -207,7 +208,7 @@ public class SpeedOverlayService extends Service {
                 speedChart.setHoleColor(Color.WHITE);
                 speedChart.setCenterTextColor(Color.BLACK);
             }
-            speedChart.setCenterTextSize(20f);
+            speedChart.setCenterTextSize(25f);
             speedChart.setHoleRadius(90);
             speedChart.getLegend().setEnabled(false);
 

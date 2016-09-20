@@ -367,12 +367,15 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void stopOverlayService() {
-        Intent stop = new Intent(this, SpeedOverlayService.class);
-        stop.setAction("stop");
-        startService(stop);
+       // if(prefs.getBoolean("speedOverlay", true)) {
+            Intent stop = new Intent(this, SpeedOverlayService.class);
+            stop.setAction("stop");
+            startService(stop);
+       // }
     }
     private void startOverlayService() {
-        startService(new Intent(this, SpeedOverlayService.class));
+        if(prefs.getBoolean("speedOverlay", true))
+            startService(new Intent(this, SpeedOverlayService.class));
     }
 
 }

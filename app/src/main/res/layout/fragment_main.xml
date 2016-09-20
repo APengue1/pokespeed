@@ -43,10 +43,10 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:id="@+id/mainSpeed"
         android:layout_alignBottom="@+id/imageView6"
-        android:layout_alignLeft="@+id/toggleSpeedService"
-        android:layout_alignStart="@+id/toggleSpeedService"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/textView3"
+        android:layout_toEndOf="@+id/textView3" />
 
         <ImageView
         android:layout_width="wrap_content"
