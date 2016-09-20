@@ -346,6 +346,7 @@ public class SpeedService extends Service implements LocationListener{
     public void onDestroy() {
         removeLocation();
         sendServiceStatusChanged(false);
+        stopOverlayService();
         stopSelf();
         super.onDestroy();
     }

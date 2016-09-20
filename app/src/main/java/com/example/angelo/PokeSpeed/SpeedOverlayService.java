@@ -34,6 +34,7 @@ public class SpeedOverlayService extends Service {
 
     private WindowManager wm;
     private PieChart speedOverlay;
+    private View overlayView;
     private PokeSpeedStats stats;
     private WindowManager.LayoutParams params;
 
@@ -56,11 +57,13 @@ public class SpeedOverlayService extends Service {
         params.x = 0;
         params.y = 100;
 
+        overlayView = LayoutInflater.from(getApplicationContext())
+                .inflate(R.layout.speed_overlay, null);
         speedOverlay = new PieChart(this);
-        wm.addView(speedOverlay, params);
+        wm.addView(overlayView, params);
         showStats();
 
-        speedOverlay.setOnTouchListener(new View.OnTouchListener() {
+        overlayView.setOnTouchListener(new View.OnTouchListener() {
             private int initialX;
             private int initialY;
             private float initialTouchX;
@@ -79,7 +82,7 @@ public class SpeedOverlayService extends Service {
                     case MotionEvent.ACTION_MOVE:
                         params.x = initialX + (int) (event.getRawX() - initialTouchX);
                         params.y = initialY + (int) (event.getRawY() - initialTouchY);
-                        wm.updateViewLayout(speedOverlay, params);
+                        wm.updateViewLayout(overlayView, params);
                         return true;
                 }
                 return false;
@@ -90,7 +93,7 @@ public class SpeedOverlayService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction() != null && intent.getAction().equals("stop")) {
-            wm.removeViewImmediate(speedOverlay);
+            wm.removeViewImmediate(overlayView);
             stopSelf();
         }
         return START_NOT_STICKY;
@@ -124,8 +127,9 @@ public class SpeedOverlayService extends Service {
     }
 
     private void showStats() {
-        if(speedOverlay.isShown()) {
+        if(overlayView.isShown()) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            PieChart pie = (PieChart) overlayView.findViewById(R.id.pieChart);
 
             float fDistanceValid = 0;
             float fdistanceCovered = 0;
@@ -134,7 +138,7 @@ public class SpeedOverlayService extends Service {
 
             stats = MainActivity.stats;
             if (stats != null) {
-                speedOverlay.setNoDataText("Turn on GO Speed and start moving to see some stats!");
+                pie.setNoDataText("Turn on GO Speed and start moving to see some stats!");
                 double[] statsValues = stats.getStats();
                 fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
                 fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
@@ -159,18 +163,18 @@ public class SpeedOverlayService extends Service {
             pieData.setValueFormatter(new PercentFormatter());
             pieData.setValueTextSize(20f);
             pieData.setValueTextColor(Color.WHITE);
-            speedOverlay.setData(pieData);
+            pie.setData(pieData);
 
-            speedOverlay.setUsePercentValues(true);
-            speedOverlay.setDescription("Distance Summary");
-            speedOverlay.setDescriptionTextSize(25f);
-            speedOverlay.setCenterText(
+            pie.setUsePercentValues(true);
+            pie.setDescription("Distance Summary");
+            pie.setDescriptionTextSize(25f);
+            pie.setCenterText(
                     String.format("Avg Speed: %.2f %s%nMax Speed: %.2f %s",
                             faverageSpeed, units + "/h",
                             fmaxSpeed, units + "/h"));
-            speedOverlay.setCenterTextSize(15f);
-            speedOverlay.setHoleRadius(55);
-            Legend pieLegend = speedOverlay.getLegend();
+            pie.setCenterTextSize(15f);
+            pie.setHoleRadius(55);
+            Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
                     new int[]{getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
                     new String[]{"Valid", "Invalid"}
@@ -178,8 +182,8 @@ public class SpeedOverlayService extends Service {
             pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
             pieLegend.setForm(Legend.LegendForm.CIRCLE);
             pieLegend.setTextSize(15f);
-            speedOverlay.invalidate();
-            wm.updateViewLayout(speedOverlay, params);
+            pie.invalidate();
+            wm.updateViewLayout(overlayView, params);
         }
     }
 }
