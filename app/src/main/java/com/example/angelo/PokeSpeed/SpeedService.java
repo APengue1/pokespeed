@@ -31,7 +31,7 @@ public class SpeedService extends Service implements LocationListener{
     private Long lastTime;
     private NotificationManagerCompat notificationManager;
     //private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
-    private static final long[] VIBRATE_RED = new long[]{500, 500};
+    private static final long[] VIBRATE_RED = new long[]{0, 35};
     private static final int NOTIFY_ID = 1;
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
     private static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
