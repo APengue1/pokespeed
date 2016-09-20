@@ -23,7 +23,7 @@ import android.view.WindowManager;
 public class SpeedService extends Service implements LocationListener{
 
     private SharedPreferences prefs;
-    private double SPEED_RED, SPEED_YELLOW;
+    static double SPEED_RED, SPEED_YELLOW;
 
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
