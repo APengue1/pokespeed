@@ -23,7 +23,7 @@ import android.view.WindowManager;
 public class SpeedService extends Service implements LocationListener{
 
     private SharedPreferences prefs;
-    static double SPEED_RED, SPEED_YELLOW;
+    static double SPEED_RED, SPEED_YELLOW, speedDefault;
 
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
@@ -53,7 +53,8 @@ public class SpeedService extends Service implements LocationListener{
     @Override
     public void onCreate() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", "11"));
+        speedDefault = 11;
+        SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", Double.toString(speedDefault)));
         SPEED_YELLOW = SPEED_RED - 1.5;
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

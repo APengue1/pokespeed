@@ -16,7 +16,7 @@ public class PokeSpeedStats {
 
     public PokeSpeedStats(SharedPreferences _prefs) {
         prefs = _prefs;
-        speedRed = Double.parseDouble(prefs.getString("maxSpeed", "11"));
+        speedRed = Double.parseDouble(prefs.getString("maxSpeed", Double.toString(SpeedService.speedDefault)));
         reset();
     }
 

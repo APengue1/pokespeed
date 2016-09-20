@@ -4,12 +4,14 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -96,8 +98,15 @@ public class SpeedOverlayService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction() != null && intent.getAction().equals("stop")) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessagereceiver);
             wm.removeViewImmediate(overlayView);
             stopSelf();
+        }
+        else {
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    mMessagereceiver,
+                    new IntentFilter("SpeedRefreshed")
+            );
         }
         return START_NOT_STICKY;
     }
@@ -107,14 +116,8 @@ public class SpeedOverlayService extends Service {
     private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("StatsRefreshed"))
+            if(intent.getAction().equals("SpeedRefreshed"))
                 showStats();
-            else if(intent.getAction().equals("ServiceStatusChanged")) {
-                if(intent.getBooleanExtra("status", true))
-                    ;//showResetButton(true);
-                else
-                    ;//showResetButton(false);
-            }
         }
     };
 
@@ -149,12 +152,9 @@ public class SpeedOverlayService extends Service {
     private void showStats() {
         if(overlayView.isShown()) {
             String units = prefs.getBoolean("imperial", false) ? "mi" : "km";
-            Locale l = Locale.getDefault();
 
             float fDistanceValid = 0;
             float fdistanceCovered = 0;
-            float faverageSpeed = 0;
-            float fmaxSpeed = 0;
 
             stats = MainActivity.stats;
             if (stats != null) {
@@ -162,32 +162,27 @@ public class SpeedOverlayService extends Service {
                 double[] statsValues = stats.getStats();
                 fDistanceValid = Double.valueOf(statsValues[0]).floatValue();
                 fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
-                faverageSpeed = Double.valueOf(statsValues[3]).floatValue();
-                fmaxSpeed = Double.valueOf(statsValues[4]).floatValue();
             }
 
             List<PieEntry> pieEntries = new ArrayList<>();
-            pieEntries.add(new PieEntry(0.5f, ""));
+            pieEntries.add(new PieEntry(fDistanceValid));
 //            pieEntries.add(new PieEntry(fDistanceValid,
 //                    String.format(l, "%.3f", fDistanceValid) + units));
-           // if (StatsFragment.significantDifference(fdistanceCovered, fDistanceValid))
-                pieEntries.add(new PieEntry(0.5f, ""));
+            if (StatsFragment.significantDifference(fdistanceCovered, fDistanceValid))
+                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid));
 //                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
 //                        String.format(l, "%.3f", fdistanceCovered - fDistanceValid) + units));
 
             PieDataSet pieSet = new PieDataSet(pieEntries, "");
             pieSet.setColors(new int[]{getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)});
-            pieSet.setSliceSpace(0);
+            pieSet.setSliceSpace(1);
+            pieSet.setDrawValues(false);
 
             PieData pieData = new PieData(pieSet);
-            pieData.setValueFormatter(new PercentFormatter());
-            pieData.setValueTextSize(0f);
-            pieData.setValueTextColor(Color.WHITE);
             speedChart.setData(pieData);
-
-            speedChart.setUsePercentValues(true);
             speedChart.setDescription("");
             speedChart.setDescriptionTextSize(0f);
+
             String lastSpeed = SpeedService.getLastSpeed();
             speedChart.setCenterTextColor(Color.WHITE);
             try {
@@ -210,17 +205,12 @@ public class SpeedOverlayService extends Service {
             catch(NumberFormatException e) {
                 speedChart.setCenterText(lastSpeed);
                 speedChart.setHoleColor(Color.WHITE);
+                speedChart.setCenterTextColor(Color.BLACK);
             }
             speedChart.setCenterTextSize(20f);
             speedChart.setHoleRadius(90);
-            Legend pieLegend = speedChart.getLegend();
-            pieLegend.setCustom(
-                    new int[]{getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
-                    new String[]{"Valid", "Invalid"}
-            );
-            pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
-            pieLegend.setForm(Legend.LegendForm.CIRCLE);
-            pieLegend.setTextSize(15f);
+            speedChart.getLegend().setEnabled(false);
+
             speedChart.invalidate();
             wm.updateViewLayout(overlayView, params);
         }
