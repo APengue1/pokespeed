@@ -4,8 +4,8 @@
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/pieChart"
-        android:layout_width="150dp"
-        android:layout_height="150dp">
+        android:layout_width="125dp"
+        android:layout_height="125dp">
 
     </com.github.mikephil.charting.charts.PieChart>
 

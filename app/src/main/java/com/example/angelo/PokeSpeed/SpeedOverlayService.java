@@ -59,8 +59,8 @@ public class SpeedOverlayService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.TOP | Gravity.CENTER_VERTICAL;
-        params.x = 0;
-        params.y = 100;
+        params.x = 500;
+        params.y = 1500;
 
         overlayView = LayoutInflater.from(getApplicationContext())
                 .inflate(R.layout.speed_overlay, null);
