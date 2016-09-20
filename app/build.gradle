@@ -7,8 +7,8 @@ android {
         applicationId 'com.apengue.PokeSpeed'
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 8
-        versionName '1.0.8'
+        versionCode 20
+        versionName '2.0.0'
     }
     buildTypes {
         release {
