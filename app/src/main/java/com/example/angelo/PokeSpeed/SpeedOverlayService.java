@@ -33,6 +33,7 @@ public class SpeedOverlayService extends Service {
     private PokeSpeedStats stats;
     private WindowManager.LayoutParams params;
     SharedPreferences prefs;
+    private static boolean overlayOn;
 
     public SpeedOverlayService() {
     }
@@ -40,57 +41,64 @@ public class SpeedOverlayService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
+        if(prefs.getBoolean("speedOverlay", true)) {
+            wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.START;
-        //params.x = 0;
-        params.y = 100;
+            params.gravity = Gravity.START;
+            //params.x = 0;
+            params.y = 100;
 
-        overlayView = LayoutInflater.from(getApplicationContext())
-                .inflate(R.layout.speed_overlay, null);
-        speedChart = (PieChart) overlayView.findViewById(R.id.pieChart);
-        wm.addView(overlayView, params);
-        showStats();
+            overlayView = LayoutInflater.from(getApplicationContext())
+                    .inflate(R.layout.speed_overlay, null);
+            speedChart = (PieChart) overlayView.findViewById(R.id.pieChart);
+            wm.addView(overlayView, params);
+            overlayOn = true;
+            showStats();
 
-        speedChart.setOnTouchListener(new View.OnTouchListener() {
-            private int initialX;
-            private int initialY;
-            private float initialTouchX;
-            private float initialTouchY;
+            speedChart.setOnTouchListener(new View.OnTouchListener() {
+                private int initialX;
+                private int initialY;
+                private float initialTouchX;
+                private float initialTouchY;
 
-            @Override public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        initialX = params.x;
-                        initialY = params.y;
-                        initialTouchX = event.getRawX();
-                        initialTouchY = event.getRawY();
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        params.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        params.y = initialY + (int) (event.getRawY() - initialTouchY);
-                        wm.updateViewLayout(overlayView, params);
-                        return true;
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            initialX = params.x;
+                            initialY = params.y;
+                            initialTouchX = event.getRawX();
+                            initialTouchY = event.getRawY();
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            return true;
+                        case MotionEvent.ACTION_MOVE:
+                            params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                            params.y = initialY + (int) (event.getRawY() - initialTouchY);
+                            wm.updateViewLayout(overlayView, params);
+                            return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction() != null && intent.getAction().equals("stop")) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessagereceiver);
-            wm.removeViewImmediate(overlayView);
+            if(overlayOn) {
+                wm.removeViewImmediate(overlayView);
+                overlayOn = false;
+            }
             stopSelf();
         }
         else {
@@ -141,7 +149,7 @@ public class SpeedOverlayService extends Service {
     }
 
     private void showStats() {
-        if(overlayView.isShown()) {
+        if(overlayView.isShown() && overlayOn) {
             String units = prefs.getBoolean("imperial", false) ? "mi" : "km";
 
             float fDistanceValid = 0;

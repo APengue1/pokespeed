@@ -10,8 +10,10 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -257,9 +259,29 @@ public class MainFragment extends Fragment {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
         }
+        else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                !Settings.canDrawOverlays(getActivity().getApplicationContext()) &&
+                prefs.getBoolean("speedOverlay", true)) {
+            String toast = "Please allow GO Speed to draw over other apps to use the speed overlay";
+            for(int i = 1; i <= 4; i++) {
+                Toast.makeText(getActivity().getApplicationContext(),
+                        toast,
+                        Toast.LENGTH_LONG)
+                        .show();
+            }
+            requestSystemAlertPermission();
+        }
         else {
             _startSpeedService();
         }
+    }
+
+    private void requestSystemAlertPermission() {
+        final String packageName = getActivity().getApplicationContext().getPackageName();
+        final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + packageName));
+        //getActivity().getApplicationContext().startActivity(intent);
+        if(intent.resolveActivity(getActivity().getPackageManager()) != null)
+            startActivity(intent);
     }
 
     @Override
