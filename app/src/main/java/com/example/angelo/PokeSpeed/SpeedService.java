@@ -13,6 +13,7 @@ import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -26,11 +27,12 @@ public class SpeedService extends Service implements LocationListener{
 
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
+    private Vibrator vibrateService;
     private Location lastLocation;
     private Long lastTime;
     private NotificationManagerCompat notificationManager;
     //private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
-    private static final long[] VIBRATE_RED = new long[]{0, 35};
+    //private static final long[] VIBRATE_RED = new long[]{0, 35};
     private static final int NOTIFY_ID = 1;
     private static final String STOP_SERVICE_ACTION = "Stop Service Action";
     private static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
@@ -51,6 +53,7 @@ public class SpeedService extends Service implements LocationListener{
 
     @Override
     public void onCreate() {
+        vibrateService = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         speedDefault = 11;
         SPEED_RED = Double.parseDouble(prefs.getString("maxSpeed", Double.toString(speedDefault)));
@@ -112,6 +115,7 @@ public class SpeedService extends Service implements LocationListener{
                 .setContentTitle("GO Speed")
                 .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setVibrate(null)
                 .setContentIntent(resultPendingIntent);
     }
 
@@ -305,8 +309,10 @@ public class SpeedService extends Service implements LocationListener{
             argb = Color.RED;
             mBuilder.setSmallIcon(R.drawable.ic_stat_stop);
             contentText = "Over speed limit.";
-            if(bVibrate)
-                mBuilder.setVibrate(SpeedService.VIBRATE_RED);
+            if(bVibrate) {
+               // mBuilder.setVibrate(SpeedService.VIBRATE_RED);
+                vibrateService.vibrate(35);
+            }
         }
         else if(fSpeed >= SPEED_YELLOW) {
             argb = getResources().getColor(R.color.colorPokeYellow);
