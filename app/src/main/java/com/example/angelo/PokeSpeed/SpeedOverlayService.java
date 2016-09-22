@@ -190,16 +190,16 @@ public class SpeedOverlayService extends Service {
                 speedChart.setCenterText(String.format("%s %n%s/h", speed, units));
                 if(dSpeed >= SpeedService.SPEED_RED) {
                     //centerColor.setColor(getResources().getColor(R.color.colorPrimaryDark));
-                    speedChart.setHoleColor(getResources().getColor(R.color.colorPrimaryDark));
+                    speedChart.setHoleColor(getResources().getColor(R.color.colorPrimaryTransparent));
                 }
                 else if(dSpeed >= SpeedService.SPEED_YELLOW) {
                     //centerColor.setColor(getResources().getColor(R.color.colorPokeYellow));
-                    speedChart.setHoleColor(getResources().getColor(R.color.colorPokeYellow));
+                    speedChart.setHoleColor(getResources().getColor(R.color.colorPokeYellowTransparent));
                     speedChart.setCenterTextColor(Color.BLACK);
                 }
                 else {
                     //centerColor.setColor(getResources().getColor(R.color.colorAccent));
-                    speedChart.setHoleColor(getResources().getColor(R.color.colorAccent));
+                    speedChart.setHoleColor(getResources().getColor(R.color.colorAccentTransparent));
                 }
             }
             catch(NumberFormatException e) {
