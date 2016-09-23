@@ -82,7 +82,11 @@ public class MainActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if(statsFragment.isAdded()) {
+            showMain();
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -106,11 +110,9 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_main) {
-            mFragment.beginTransaction().replace(
-                    R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
+            showMain();
         } else if (id == R.id.nav_stats) {
-            mFragment.beginTransaction().replace(
-                    R.id.layout_main, statsFragment, statsFragment.getTag()).commit();
+            showStats();
         }  else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }
@@ -126,6 +128,16 @@ public class MainActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showMain() {
+        mFragment.beginTransaction().replace(
+                R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
+    }
+
+    private void showStats() {
+        mFragment.beginTransaction().replace(
+                R.id.layout_main, statsFragment, statsFragment.getTag()).commit();
     }
 
     private void shareApp() {
