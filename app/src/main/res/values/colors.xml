@@ -10,4 +10,5 @@
     <color name="colorPrimaryTransparent">#afda0000</color>
     <color name="colorAccentTransparent">#af020ca5</color>
     <color name="colorPokeYellowTransparent">#aff8d000</color>
+    <color name="whiteTransparent">#afffffff</color>
 </resources>

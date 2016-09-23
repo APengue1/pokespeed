@@ -204,7 +204,7 @@ public class SpeedOverlayService extends Service {
             }
             catch(NumberFormatException e) {
                 speedChart.setCenterText(lastSpeed);
-                speedChart.setHoleColor(Color.WHITE);
+                speedChart.setHoleColor(R.color.whiteTransparent);
                 speedChart.setCenterTextColor(Color.BLACK);
             }
             speedChart.setCenterTextSize(25f);

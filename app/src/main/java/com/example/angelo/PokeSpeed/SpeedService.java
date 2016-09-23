@@ -47,7 +47,7 @@ public class SpeedService extends Service implements LocationListener{
     private static final String TURN_ON_GPS = "Turn on gps";
     private static final int MIN_ACCURACY = 15;
     private static final long MIN_TIME_FAST = 0;
-    private static final long MIN_TIME_DEFAULT = 1000;
+    private static final long MIN_TIME_DEFAULT = 1500;
 
     private static boolean requestGpsFast, requestGpsDefault;
 
@@ -152,7 +152,7 @@ public class SpeedService extends Service implements LocationListener{
             else if(intent.getAction().equals(SpeedService.PAUSE_SERVICE_ACTION)) {
                 removeLocation();
                 mBuilder = getDefaultBuilder();
-                mBuilder.setContentText("Paused");
+                mBuilder.setContentText("Paused - " + distanceSummmary());
                 addPlayAction(mBuilder);
                 setLastSpeed("Paused");
                 notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
@@ -301,7 +301,7 @@ public class SpeedService extends Service implements LocationListener{
     private void setSpeed(Float speed) {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean bVibrate = prefs.getBoolean("vibrate", true);
-        String unit = prefs.getBoolean("imperial", false) ? "mi" : "km";
+        String unit = getUnit();
         Double fSpeed = getSpeedForLocale(speed);
         int argb;
         String contentText;
@@ -329,16 +329,21 @@ public class SpeedService extends Service implements LocationListener{
             mBuilder.setVibrate(null);
         }
         mBuilder.setContentTitle(String.format("GO speed is %.2f %s", fSpeed, unit + "/h"));
-        mBuilder.setContentText(String.format("%s %s", contentText, distanceSummmary(unit)));
+        mBuilder.setContentText(String.format("%s %s", contentText, distanceSummmary()));
         mBuilder.setColor(argb);
         notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
         setLastSpeed(String.format("%.2f", fSpeed));
     }
 
-    private String distanceSummmary(String unit) {
+    private String distanceSummmary() {
+        String unit = getUnit();
         String distanceValid = String.format("%.2f", stats.getDistanceValid());
         String distanceCovered = String.format("%.2f", stats.getDistanceCovered());
         return String.format("%s/%s %s valid", distanceValid, distanceCovered, unit);
+    }
+
+    private String getUnit() {
+        return prefs.getBoolean("imperial", false) ? "mi" : "km";
     }
 
     private double getSpeedForLocale(double i) {
