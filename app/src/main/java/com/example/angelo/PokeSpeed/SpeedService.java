@@ -152,7 +152,7 @@ public class SpeedService extends Service implements LocationListener{
             else if(intent.getAction().equals(SpeedService.PAUSE_SERVICE_ACTION)) {
                 removeLocation();
                 mBuilder = getDefaultBuilder();
-                mBuilder.setContentText("Paused - " + distanceSummmary());
+                mBuilder.setContentText("Paused. " + distanceSummmary());
                 addPlayAction(mBuilder);
                 setLastSpeed("Paused");
                 notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
