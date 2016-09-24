@@ -133,11 +133,15 @@ public class MainActivity extends AppCompatActivity implements
     private void showMain() {
         mFragment.beginTransaction().replace(
                 R.id.layout_main, mainFragment, mainFragment.getTag()).commit();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     private void showStats() {
         mFragment.beginTransaction().replace(
                 R.id.layout_main, statsFragment, statsFragment.getTag()).commit();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.getMenu().getItem(1).setChecked(true);
     }
 
     private void shareApp() {
