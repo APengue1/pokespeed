@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -32,8 +33,10 @@ public class SpeedOverlayService extends Service {
     private WindowManager wm;
     private PieChart speedChart;
     private View overlayView;
+    private View overlayCloseView;
     private PokeSpeedStats stats;
     private WindowManager.LayoutParams params;
+    private WindowManager.LayoutParams paramsClose;
     SharedPreferences prefs;
     private static boolean overlayOn;
 
@@ -52,13 +55,22 @@ public class SpeedOverlayService extends Service {
                     WindowManager.LayoutParams.TYPE_PHONE,
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
-
             params.gravity = Gravity.START;
-            //params.x = 0;
             params.y = 100;
+
+            paramsClose = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT);
+            paramsClose.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
 
             overlayView = LayoutInflater.from(getApplicationContext())
                     .inflate(R.layout.speed_overlay, null);
+            overlayCloseView = LayoutInflater.from(getApplicationContext())
+                    .inflate(R.layout.speed_overlay_close, null);
+            overlayCloseView.setVisibility(View.INVISIBLE);
 
             speedChart = (PieChart) overlayView.findViewById(R.id.pieChart);
             ViewGroup.LayoutParams pieParams = speedChart.getLayoutParams();
@@ -82,6 +94,7 @@ public class SpeedOverlayService extends Service {
             speedChart.setLayoutParams(pieParams);
 
             wm.addView(overlayView, params);
+            wm.addView(overlayCloseView, paramsClose);
             overlayOn = true;
             showStats();
 
@@ -101,8 +114,12 @@ public class SpeedOverlayService extends Service {
                             initialTouchY = event.getRawY();
                             return true;
                         case MotionEvent.ACTION_UP:
+                            overlayCloseView.setVisibility(View.INVISIBLE);
+                            if (isViewOverlapping(overlayView, overlayCloseView))
+                                stopSpeedService();
                             return true;
                         case MotionEvent.ACTION_MOVE:
+                            overlayCloseView.setVisibility(View.VISIBLE);
                             params.x = initialX + (int) (event.getRawX() - initialTouchX);
                             params.y = initialY + (int) (event.getRawY() - initialTouchY);
                             wm.updateViewLayout(overlayView, params);
@@ -114,20 +131,36 @@ public class SpeedOverlayService extends Service {
         }
     }
 
+    private void stopSpeedService() {
+        Intent stopSpeedServiceIntent = new Intent(this, SpeedService.class);
+        stopSpeedServiceIntent.setAction(SpeedService.STOP_SERVICE_ACTION);
+        startService(stopSpeedServiceIntent);
+    }
+
     private int dpiToPx(int dpi) {
         DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         return (int)((dpi * displayMetrics.density) + 0.5);
     }
+    private boolean isViewOverlapping(View firstView, View secondView) {
+        int[] firstPosition = new int[2];
+        int[] secondPosition = new int[2];
+
+        firstView.getLocationOnScreen(firstPosition);
+        secondView.getLocationOnScreen(secondPosition);
+
+        // Rect constructor parameters: left, top, right, bottom
+        Rect rectFirstView = new Rect(firstPosition[0], firstPosition[1],
+                firstPosition[0] + firstView.getMeasuredWidth(), firstPosition[1] + firstView.getMeasuredHeight());
+        Rect rectSecondView = new Rect(secondPosition[0], secondPosition[1],
+                secondPosition[0] + secondView.getMeasuredWidth(), secondPosition[1] + secondView.getMeasuredHeight());
+        return rectFirstView.intersect(rectSecondView);
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction() != null && intent.getAction().equals("stop")) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessagereceiver);
-            if(overlayOn) {
-                wm.removeViewImmediate(overlayView);
-                overlayOn = false;
-            }
-            stopSelf();
+            stop();
         }
         else {
             LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -138,6 +171,14 @@ public class SpeedOverlayService extends Service {
         return START_NOT_STICKY;
     }
 
+    private void stop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessagereceiver);
+        if(overlayOn) {
+            wm.removeViewImmediate(overlayView);
+            overlayOn = false;
+        }
+        stopSelf();
+    }
 
 
     private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {

@@ -18,6 +18,7 @@
        android:key="speedOverlay" />
    <ListPreference
        android:key="speedOverlaySize"
+       android:summary="Takes effect after app turned on again"
        android:title="Size of Speed Overlay"
        android:entries="@array/overlaySizeEntries"
        android:entryValues="@array/overlaySizeValues" />
