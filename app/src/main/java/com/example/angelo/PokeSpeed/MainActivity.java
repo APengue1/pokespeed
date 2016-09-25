@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements
                 .putBoolean("imperial", false)
                 .putBoolean("speedOverlay", true)
                 .putBoolean("firstInit", true)
+                .putString("speedOverlaySize", "medium")
                 .commit();
         }
         PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, true);

@@ -11,10 +11,12 @@ import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.github.mikephil.charting.charts.PieChart;
@@ -57,7 +59,28 @@ public class SpeedOverlayService extends Service {
 
             overlayView = LayoutInflater.from(getApplicationContext())
                     .inflate(R.layout.speed_overlay, null);
+
             speedChart = (PieChart) overlayView.findViewById(R.id.pieChart);
+            ViewGroup.LayoutParams pieParams = speedChart.getLayoutParams();
+            int height, width;
+            switch(prefs.getString("speedOverlaySize", "medium")) {
+                case "small":
+                    height = width = dpiToPx(75);
+                    break;
+                case "medium":
+                    height = width = dpiToPx(100);
+                    break;
+                case "large":
+                    height = width = dpiToPx(125);
+                    break;
+                default:
+                    height = width = dpiToPx(100);
+                    break;
+            }
+            pieParams.height = height;
+            pieParams.width = width;
+            speedChart.setLayoutParams(pieParams);
+
             wm.addView(overlayView, params);
             overlayOn = true;
             showStats();
@@ -89,6 +112,11 @@ public class SpeedOverlayService extends Service {
                 }
             });
         }
+    }
+
+    private int dpiToPx(int dpi) {
+        DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
+        return (int)((dpi * displayMetrics.density) + 0.5);
     }
 
     @Override
@@ -207,7 +235,21 @@ public class SpeedOverlayService extends Service {
                 speedChart.setHoleColor(getResources().getColor(R.color.whiteTransparent));
                 speedChart.setCenterTextColor(Color.BLACK);
             }
-            speedChart.setCenterTextSize(25f);
+            switch(prefs.getString("speedOverlaySize", "medium")) {
+                case "small":
+                    speedChart.setCenterTextSize(17f);
+                    break;
+                case "medium":
+                    speedChart.setCenterTextSize(22f);
+                    break;
+                case "large":
+                    speedChart.setCenterTextSize(25f);
+                    break;
+                default:
+                    speedChart.setCenterTextSize(22f);
+                    break;
+            }
+            //speedChart.setCenterTextSize(25f);
             speedChart.setHoleRadius(90);
             speedChart.getLegend().setEnabled(false);
 

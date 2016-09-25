@@ -5,20 +5,22 @@
     android:layout_height="match_parent">
 
    <SwitchPreference
-       android:summaryOn="Imperial Units"
-       android:summaryOff="Imperial Units"
+       android:title="Imperial Units"
        android:defaultValue="false"
        android:key="imperial" />
    <SwitchPreference
-       android:summaryOn="Vibrate"
-       android:summaryOff="Vibrate"
+       android:title="Vibrate"
        android:defaultValue="true"
        android:key="vibrate" />
    <SwitchPreference
-       android:summaryOn="Speed Overlay"
-       android:summaryOff="Speed Overlay"
+       android:title="Speed Overlay"
        android:defaultValue="true"
        android:key="speedOverlay" />
+   <ListPreference
+       android:key="speedOverlaySize"
+       android:title="Size of Speed Overlay"
+       android:entries="@array/overlaySizeEntries"
+       android:entryValues="@array/overlaySizeValues" />
     <!--
    <EditTextPreference
        android:key="maxSpeed"
