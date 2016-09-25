@@ -253,7 +253,7 @@ public class SpeedService extends Service implements LocationListener{
                 this.lastLocation = location;
                 this.lastTime = location.getTime();
                 speed = distanceCovered / timeElapsed; // m/ms
-                speed = speed * 60 * 60 * 60 / 1000; // km/h
+                speed = speed * 60 * 60; // km/h
                 setSpeed(speed);
                 stats.giveLocation(location, speed);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(
