@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements
     static PokeSpeedStats stats = null;
     static Boolean permissionGranted;
     static SharedPreferences prefs;
+    static final String SHOW_STATS = "showStats";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if(getIntent().getAction().equals(SHOW_STATS))
+            showStats();
     }
 
     @Override

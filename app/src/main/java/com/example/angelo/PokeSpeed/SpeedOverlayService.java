@@ -41,6 +41,7 @@ public class SpeedOverlayService extends Service {
     SharedPreferences prefs;
     private static boolean overlayOn;
     static boolean servicePlay;
+    private static Long lastClick;
 
     public SpeedOverlayService() {
     }
@@ -50,6 +51,7 @@ public class SpeedOverlayService extends Service {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         servicePlay = true;
+        lastClick = null;
         if(prefs.getBoolean("speedOverlay", true)) {
             wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             params = new WindowManager.LayoutParams(
@@ -122,6 +124,14 @@ public class SpeedOverlayService extends Service {
                             return true;
                         case MotionEvent.ACTION_UP:
                             overlayButtonsView.setVisibility(View.INVISIBLE);
+                            Long clickDelta = null;
+                            if(lastClick == null)
+                                lastClick = System.currentTimeMillis();
+                            else {
+                                long now = System.currentTimeMillis();
+                                clickDelta = now - lastClick;
+                                lastClick = now;
+                            }
                             if (isViewOverlapping(overlayView, buttonStop))
                                 stopSpeedService();
                             else if(isViewOverlapping(overlayView, buttonPause)) {
@@ -130,6 +140,8 @@ public class SpeedOverlayService extends Service {
                                 params.y = initialY;
                                 wm.updateViewLayout(overlayView, params);
                             }
+                            else if(clickDelta != null && clickDelta <= 500)
+                                openFragmentStats();
                             return true;
                         case MotionEvent.ACTION_MOVE:
                             updateButtonVisibilities();
@@ -143,6 +155,13 @@ public class SpeedOverlayService extends Service {
                 }
             });
         }
+    }
+
+    private void openFragmentStats() {
+        Intent fragmentStatsIntent = new Intent(this, MainActivity.class);
+        fragmentStatsIntent.setAction(MainActivity.SHOW_STATS);
+        fragmentStatsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(fragmentStatsIntent);
     }
 
     private void stopSpeedService() {
