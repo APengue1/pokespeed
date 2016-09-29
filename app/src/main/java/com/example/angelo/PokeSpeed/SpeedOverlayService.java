@@ -62,12 +62,12 @@ public class SpeedOverlayService extends Service {
             params.y = 100;
 
             paramsButtons = new WindowManager.LayoutParams(
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
                     WindowManager.LayoutParams.TYPE_PHONE,
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
-            paramsButtons.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            //paramsButtons.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
 
             overlayView = LayoutInflater.from(getApplicationContext())
                     .inflate(R.layout.speed_overlay, null);
