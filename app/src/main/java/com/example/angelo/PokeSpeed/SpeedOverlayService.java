@@ -159,7 +159,6 @@ public class SpeedOverlayService extends Service {
 
     private void openFragmentStats() {
         Intent fragmentStatsIntent = new Intent(this, MainActivity.class);
-        fragmentStatsIntent.setAction(MainActivity.SHOW_STATS);
         fragmentStatsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(fragmentStatsIntent);
     }
