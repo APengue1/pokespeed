@@ -1,5 +1,6 @@
 package com.example.angelo.PokeSpeed;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -132,6 +133,8 @@ public class SpeedOverlayService extends Service {
                                 clickDelta = now - lastClick;
                                 lastClick = now;
                             }
+                            if(clickDelta != null && clickDelta <= 300)
+                                openMainActivity();
                             if (isViewOverlapping(overlayView, buttonStop))
                                 stopSpeedService();
                             else if(isViewOverlapping(overlayView, buttonPause)) {
@@ -140,8 +143,6 @@ public class SpeedOverlayService extends Service {
                                 params.y = initialY;
                                 wm.updateViewLayout(overlayView, params);
                             }
-                            else if(clickDelta != null && clickDelta <= 500)
-                                openFragmentStats();
                             return true;
                         case MotionEvent.ACTION_MOVE:
                             updateButtonVisibilities();
@@ -157,10 +158,21 @@ public class SpeedOverlayService extends Service {
         }
     }
 
-    private void openFragmentStats() {
-        Intent fragmentStatsIntent = new Intent(this, MainActivity.class);
-        fragmentStatsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(fragmentStatsIntent);
+    private void openMainActivity() {
+        Intent intentMainActivity = new Intent(this, MainActivity.class);
+        //intentMainActivity.setAction(MainActivity.SHOW_STATS);
+        //intentMainActivity.putExtra(MainActivity.SHOW_STATS, MainActivity.SHOW_STATS);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intentMainActivity,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        try {
+            resultPendingIntent.send();
+        } catch (PendingIntent.CanceledException e) {
+
+        }
+        //startActivity(intentMainActivity);
     }
 
     private void stopSpeedService() {

@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        if(getIntent().getAction().equals(SHOW_STATS))
-            showStats();
+//        if(getIntent().getStringExtra(SHOW_STATS) != null)
+//            showStats();
     }
 
     @Override
