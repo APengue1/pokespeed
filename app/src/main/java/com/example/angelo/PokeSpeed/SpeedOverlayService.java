@@ -46,6 +46,12 @@ public class SpeedOverlayService extends Service {
     private static Long lastClick;
     private Locale locale;
 
+    private static boolean overlayStatsText;
+    private static int overlayDpiBase, overlayDpiIncrement;
+    private static int centerTextSizeBase, centerTextSizeIncrement;
+    private static int holeRadius;
+
+
     public SpeedOverlayService() {
     }
 
@@ -57,6 +63,20 @@ public class SpeedOverlayService extends Service {
         lastClick = null;
         locale = Locale.getDefault();
         if(prefs.getBoolean("speedOverlay", true)) {
+            overlayDpiIncrement = 25;
+            centerTextSizeIncrement = 4;
+            if(prefs.getBoolean("overlayStatsText", true)) {
+                overlayStatsText = true;
+                overlayDpiBase = 110;
+                centerTextSizeBase = 14;
+                holeRadius = 50;
+            }
+            else {
+                overlayStatsText = false;
+                overlayDpiBase = 100;
+                centerTextSizeBase = 20;
+                holeRadius = 90;
+            }
             wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             params = new WindowManager.LayoutParams(
                     WindowManager.LayoutParams.WRAP_CONTENT,
@@ -90,16 +110,16 @@ public class SpeedOverlayService extends Service {
             int height, width;
             switch(prefs.getString("speedOverlaySize", "medium")) {
                 case "small":
-                    height = width = dpiToPx(110);
+                    height = width = dpiToPx(overlayDpiBase);
                     break;
                 case "medium":
-                    height = width = dpiToPx(135);
+                    height = width = dpiToPx(overlayDpiBase + overlayDpiIncrement);
                     break;
                 case "large":
-                    height = width = dpiToPx(160);
+                    height = width = dpiToPx(overlayDpiBase + 2*overlayDpiIncrement);
                     break;
                 default:
-                    height = width = dpiToPx(135);
+                    height = width = dpiToPx(overlayDpiBase + overlayDpiIncrement);
                     break;
             }
             pieParams.height = height;
@@ -303,14 +323,20 @@ public class SpeedOverlayService extends Service {
             }
 
             String distanceValid, distanceNonValid;
-            if(fDistanceValid >= 10)
+            if(!overlayStatsText)
+                distanceValid = "";
+            else if(fDistanceValid >= 10)
                 distanceValid = String.format(locale, "%.1f", fDistanceValid);
             else
                 distanceValid = String.format(locale, "%.2f", fDistanceValid);
-            if(fdistanceCovered - fDistanceValid >= 10)
+
+            if(!overlayStatsText)
+                distanceNonValid = "";
+            else if(fdistanceCovered - fDistanceValid >= 10)
                 distanceNonValid = String.format(locale, "%.1f", fdistanceCovered - fDistanceValid);
             else
-            distanceNonValid = String.format(locale, "%.2f", fdistanceCovered - fDistanceValid);
+                distanceNonValid = String.format(locale, "%.2f", fdistanceCovered - fDistanceValid);
+
             List<PieEntry> pieEntries = new ArrayList<>();
             pieEntries.add(new PieEntry(fDistanceValid,
                     distanceValid));
@@ -359,20 +385,20 @@ public class SpeedOverlayService extends Service {
             }
             switch(prefs.getString("speedOverlaySize", "medium")) {
                 case "small":
-                    speedChart.setCenterTextSize(14f);
+                    speedChart.setCenterTextSize(centerTextSizeBase);
                     break;
                 case "medium":
-                    speedChart.setCenterTextSize(18f);
+                    speedChart.setCenterTextSize(centerTextSizeBase + centerTextSizeIncrement);
                     break;
                 case "large":
-                    speedChart.setCenterTextSize(22f);
+                    speedChart.setCenterTextSize(centerTextSizeBase + 2*centerTextSizeIncrement);
                     break;
                 default:
-                    speedChart.setCenterTextSize(18f);
+                    speedChart.setCenterTextSize(centerTextSizeBase + centerTextSizeIncrement);
                     break;
             }
             //speedChart.setCenterTextSize(25f);
-            speedChart.setHoleRadius(50);
+            speedChart.setHoleRadius(holeRadius);
             speedChart.getLegend().setEnabled(false);
 
             speedChart.invalidate();
