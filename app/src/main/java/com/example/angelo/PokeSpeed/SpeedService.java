@@ -35,8 +35,8 @@ public class SpeedService extends Service implements LocationListener{
     //private static final long[] VIBRATE_RED = new long[]{0, 35};
     private static final int NOTIFY_ID = 1;
     static final String STOP_SERVICE_ACTION = "Stop Service Action";
-    private static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
-    private static final String PLAY_SERVICE_ACTION = "Play Service Action";
+    static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
+    static final String PLAY_SERVICE_ACTION = "Play Service Action";
     private final IBinder mBinder = new LocalBinder();
     private PokeSpeedStats stats;
     private static String lastSpeed;

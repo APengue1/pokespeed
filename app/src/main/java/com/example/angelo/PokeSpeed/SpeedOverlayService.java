@@ -33,12 +33,14 @@ public class SpeedOverlayService extends Service {
     private WindowManager wm;
     private PieChart speedChart;
     private View overlayView;
-    private View overlayCloseView;
+    private View overlayButtonsView;
+    private View buttonPause, buttonPlay, buttonStop;
     private PokeSpeedStats stats;
     private WindowManager.LayoutParams params;
     private WindowManager.LayoutParams paramsClose;
     SharedPreferences prefs;
     private static boolean overlayOn;
+    private static boolean servicePlay;
 
     public SpeedOverlayService() {
     }
@@ -47,6 +49,7 @@ public class SpeedOverlayService extends Service {
     public void onCreate() {
         super.onCreate();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        servicePlay = true;
         if(prefs.getBoolean("speedOverlay", true)) {
             wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             params = new WindowManager.LayoutParams(
@@ -68,9 +71,13 @@ public class SpeedOverlayService extends Service {
 
             overlayView = LayoutInflater.from(getApplicationContext())
                     .inflate(R.layout.speed_overlay, null);
-            overlayCloseView = LayoutInflater.from(getApplicationContext())
-                    .inflate(R.layout.speed_overlay_close, null);
-            overlayCloseView.setVisibility(View.INVISIBLE);
+            overlayButtonsView = LayoutInflater.from(getApplicationContext())
+                    .inflate(R.layout.overlay_buttons, null);
+            overlayButtonsView.setVisibility(View.INVISIBLE);
+            buttonStop = overlayButtonsView.findViewById(R.id.overlayStop);
+            buttonPause = overlayButtonsView.findViewById(R.id.overlayPause);
+            buttonPlay = overlayButtonsView.findViewById(R.id.overlayPlay);
+            //buttonPlay.setVisibility(View.INVISIBLE);
 
             speedChart = (PieChart) overlayView.findViewById(R.id.pieChart);
             ViewGroup.LayoutParams pieParams = speedChart.getLayoutParams();
@@ -94,7 +101,7 @@ public class SpeedOverlayService extends Service {
             speedChart.setLayoutParams(pieParams);
 
             wm.addView(overlayView, params);
-            wm.addView(overlayCloseView, paramsClose);
+            wm.addView(overlayButtonsView, paramsClose);
             overlayOn = true;
             showStats();
 
@@ -114,12 +121,15 @@ public class SpeedOverlayService extends Service {
                             initialTouchY = event.getRawY();
                             return true;
                         case MotionEvent.ACTION_UP:
-                            overlayCloseView.setVisibility(View.INVISIBLE);
-                            if (isViewOverlapping(overlayView, overlayCloseView))
+                            overlayButtonsView.setVisibility(View.INVISIBLE);
+                            if (isViewOverlapping(overlayView, buttonStop))
                                 stopSpeedService();
+                            else if(isViewOverlapping(overlayView, buttonPause))
+                                playOrPauseSpeedService();
                             return true;
                         case MotionEvent.ACTION_MOVE:
-                            overlayCloseView.setVisibility(View.VISIBLE);
+                            updateButtonVisibilities();
+                            overlayButtonsView.setVisibility(View.VISIBLE);
                             params.x = initialX + (int) (event.getRawX() - initialTouchX);
                             params.y = initialY + (int) (event.getRawY() - initialTouchY);
                             wm.updateViewLayout(overlayView, params);
@@ -137,10 +147,35 @@ public class SpeedOverlayService extends Service {
         startService(stopSpeedServiceIntent);
     }
 
+    private void playOrPauseSpeedService() {
+        servicePlay = !servicePlay;
+        Intent speedServiceIntent = new Intent(this, SpeedService.class);
+        if(servicePlay)
+            speedServiceIntent.setAction(SpeedService.PLAY_SERVICE_ACTION);
+        else
+            speedServiceIntent.setAction(SpeedService.PAUSE_SERVICE_ACTION);
+        startService(speedServiceIntent);
+        //updateButtonVisibilities();
+    }
+
+    private void updateButtonVisibilities() {
+        if(servicePlay) {
+            buttonPlay.setVisibility(View.INVISIBLE);
+            buttonPause.setVisibility(View.VISIBLE);
+            buttonPause.bringToFront();
+        }
+        else {
+            buttonPause.setVisibility(View.INVISIBLE);
+            buttonPlay.setVisibility(View.VISIBLE);
+            buttonPlay.bringToFront();
+        }
+    }
+
     private int dpiToPx(int dpi) {
         DisplayMetrics displayMetrics = getApplicationContext().getResources().getDisplayMetrics();
         return (int)((dpi * displayMetrics.density) + 0.5);
     }
+
     private boolean isViewOverlapping(View firstView, View secondView) {
         int[] firstPosition = new int[2];
         int[] secondPosition = new int[2];
