@@ -156,6 +156,7 @@ public class SpeedService extends Service implements LocationListener{
                 addPlayAction(mBuilder);
                 setLastSpeed("Paused");
                 notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
+                SpeedOverlayService.servicePlay = !SpeedOverlayService.servicePlay;
             }
             else if(intent.getAction().equals(SpeedService.PLAY_SERVICE_ACTION)) {
                 requestLocation(MIN_TIME_FAST);
@@ -164,6 +165,7 @@ public class SpeedService extends Service implements LocationListener{
                 addPauseAction(mBuilder);
                 setLastSpeed(LOCATION_WAIT);
                 initNotification();
+                SpeedOverlayService.servicePlay = !SpeedOverlayService.servicePlay;
             }
         }
         else {

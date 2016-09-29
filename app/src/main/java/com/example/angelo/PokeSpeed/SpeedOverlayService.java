@@ -40,7 +40,7 @@ public class SpeedOverlayService extends Service {
     private WindowManager.LayoutParams paramsButtons;
     SharedPreferences prefs;
     private static boolean overlayOn;
-    private static boolean servicePlay;
+    static boolean servicePlay;
 
     public SpeedOverlayService() {
     }
@@ -152,12 +152,12 @@ public class SpeedOverlayService extends Service {
     }
 
     private void playOrPauseSpeedService() {
-        servicePlay = !servicePlay;
+        //servicePlay = !servicePlay;
         Intent speedServiceIntent = new Intent(this, SpeedService.class);
         if(servicePlay)
-            speedServiceIntent.setAction(SpeedService.PLAY_SERVICE_ACTION);
-        else
             speedServiceIntent.setAction(SpeedService.PAUSE_SERVICE_ACTION);
+        else
+            speedServiceIntent.setAction(SpeedService.PLAY_SERVICE_ACTION);
         startService(speedServiceIntent);
         //updateButtonVisibilities();
     }
