@@ -124,8 +124,12 @@ public class SpeedOverlayService extends Service {
                             overlayButtonsView.setVisibility(View.INVISIBLE);
                             if (isViewOverlapping(overlayView, buttonStop))
                                 stopSpeedService();
-                            else if(isViewOverlapping(overlayView, buttonPause))
+                            else if(isViewOverlapping(overlayView, buttonPause)) {
                                 playOrPauseSpeedService();
+                                params.x = initialX;
+                                params.y = initialY;
+                                wm.updateViewLayout(overlayView, params);
+                            }
                             return true;
                         case MotionEvent.ACTION_MOVE:
                             updateButtonVisibilities();
