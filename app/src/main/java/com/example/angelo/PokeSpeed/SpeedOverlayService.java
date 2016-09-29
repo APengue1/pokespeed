@@ -37,7 +37,7 @@ public class SpeedOverlayService extends Service {
     private View buttonPause, buttonPlay, buttonStop;
     private PokeSpeedStats stats;
     private WindowManager.LayoutParams params;
-    private WindowManager.LayoutParams paramsClose;
+    private WindowManager.LayoutParams paramsButtons;
     SharedPreferences prefs;
     private static boolean overlayOn;
     private static boolean servicePlay;
@@ -61,13 +61,13 @@ public class SpeedOverlayService extends Service {
             params.gravity = Gravity.START;
             params.y = 100;
 
-            paramsClose = new WindowManager.LayoutParams(
+            paramsButtons = new WindowManager.LayoutParams(
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.TYPE_PHONE,
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
-            paramsClose.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            paramsButtons.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
 
             overlayView = LayoutInflater.from(getApplicationContext())
                     .inflate(R.layout.speed_overlay, null);
@@ -101,7 +101,7 @@ public class SpeedOverlayService extends Service {
             speedChart.setLayoutParams(pieParams);
 
             wm.addView(overlayView, params);
-            wm.addView(overlayButtonsView, paramsClose);
+            wm.addView(overlayButtonsView, paramsButtons);
             overlayOn = true;
             showStats();
 
@@ -162,12 +162,10 @@ public class SpeedOverlayService extends Service {
         if(servicePlay) {
             buttonPlay.setVisibility(View.INVISIBLE);
             buttonPause.setVisibility(View.VISIBLE);
-            buttonPause.bringToFront();
         }
         else {
             buttonPause.setVisibility(View.INVISIBLE);
             buttonPlay.setVisibility(View.VISIBLE);
-            buttonPlay.bringToFront();
         }
     }
 
