@@ -28,6 +28,7 @@ import com.github.mikephil.charting.data.PieEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SpeedOverlayService extends Service {
 
@@ -43,6 +44,7 @@ public class SpeedOverlayService extends Service {
     private static boolean overlayOn;
     static boolean servicePlay;
     private static Long lastClick;
+    private Locale locale;
 
     public SpeedOverlayService() {
     }
@@ -53,6 +55,7 @@ public class SpeedOverlayService extends Service {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         servicePlay = true;
         lastClick = null;
+        locale = Locale.getDefault();
         if(prefs.getBoolean("speedOverlay", true)) {
             wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             params = new WindowManager.LayoutParams(
@@ -87,16 +90,16 @@ public class SpeedOverlayService extends Service {
             int height, width;
             switch(prefs.getString("speedOverlaySize", "medium")) {
                 case "small":
-                    height = width = dpiToPx(75);
+                    height = width = dpiToPx(110);
                     break;
                 case "medium":
-                    height = width = dpiToPx(100);
+                    height = width = dpiToPx(135);
                     break;
                 case "large":
-                    height = width = dpiToPx(125);
+                    height = width = dpiToPx(160);
                     break;
                 default:
-                    height = width = dpiToPx(100);
+                    height = width = dpiToPx(135);
                     break;
             }
             pieParams.height = height;
@@ -299,12 +302,23 @@ public class SpeedOverlayService extends Service {
                 fdistanceCovered = Double.valueOf(statsValues[1]).floatValue();
             }
 
+            String distanceValid, distanceNonValid;
+            if(fDistanceValid >= 10)
+                distanceValid = String.format(locale, "%.1f", fDistanceValid);
+            else
+                distanceValid = String.format(locale, "%.2f", fDistanceValid);
+            if(fdistanceCovered - fDistanceValid >= 10)
+                distanceNonValid = String.format(locale, "%.1f", fdistanceCovered - fDistanceValid);
+            else
+            distanceNonValid = String.format(locale, "%.2f", fdistanceCovered - fDistanceValid);
             List<PieEntry> pieEntries = new ArrayList<>();
-            pieEntries.add(new PieEntry(fDistanceValid));
+            pieEntries.add(new PieEntry(fDistanceValid,
+                    distanceValid));
 //            pieEntries.add(new PieEntry(fDistanceValid,
 //                    String.format(l, "%.3f", fDistanceValid) + units));
             if (StatsFragment.significantDifference(fdistanceCovered, fDistanceValid))
-                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid));
+                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
+                        distanceNonValid));
 //                pieEntries.add(new PieEntry(fdistanceCovered - fDistanceValid,
 //                        String.format(l, "%.3f", fdistanceCovered - fDistanceValid) + units));
 
@@ -345,20 +359,20 @@ public class SpeedOverlayService extends Service {
             }
             switch(prefs.getString("speedOverlaySize", "medium")) {
                 case "small":
-                    speedChart.setCenterTextSize(17f);
+                    speedChart.setCenterTextSize(14f);
                     break;
                 case "medium":
-                    speedChart.setCenterTextSize(22f);
+                    speedChart.setCenterTextSize(18f);
                     break;
                 case "large":
-                    speedChart.setCenterTextSize(25f);
+                    speedChart.setCenterTextSize(22f);
                     break;
                 default:
-                    speedChart.setCenterTextSize(22f);
+                    speedChart.setCenterTextSize(18f);
                     break;
             }
             //speedChart.setCenterTextSize(25f);
-            speedChart.setHoleRadius(90);
+            speedChart.setHoleRadius(50);
             speedChart.getLegend().setEnabled(false);
 
             speedChart.invalidate();
