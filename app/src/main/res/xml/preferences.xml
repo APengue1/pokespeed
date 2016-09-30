@@ -7,19 +7,28 @@
    <SwitchPreference
        android:title="Imperial Units"
        android:defaultValue="false"
-       android:key="imperial" />
+       android:key="imperial"
+       android:summaryOff="Turn on to use miles"
+       android:summaryOn="Turn off to use kilometers"/>
    <SwitchPreference
        android:title="Vibrate"
        android:defaultValue="true"
-       android:key="vibrate" />
+       android:key="vibrate"
+       android:summaryOn="Turn off to not vibrate phone when speed limit reached"
+       android:summaryOff="Turn on to vibrate phone when speed limit reached"/>
    <SwitchPreference
        android:title="Speed Overlay"
-       android:summary="Takes effect after app turned on again"
+       android:summary="Requires app on/off toggle"
        android:defaultValue="true"
        android:key="speedOverlay" />
+   <SwitchPreference
+       android:title="Speed Overlay Full Pie Chart View"
+       android:summary="Requires app on/off toggle"
+       android:defaultValue="true"
+       android:key="overlayText" />
    <ListPreference
        android:key="speedOverlaySize"
-       android:summary="Takes effect after app turned on again"
+       android:summary="Requires app on/off toggle"
        android:title="Size of Speed Overlay"
        android:entries="@array/overlaySizeEntries"
        android:entryValues="@array/overlaySizeValues" />

@@ -51,6 +51,12 @@ public class SpeedOverlayService extends Service {
     private static int centerTextSizeBase, centerTextSizeIncrement;
     private static int holeRadius;
 
+    private static final String
+            SIZE_SMALL = "small",
+            SIZE_MEDIUM = "medium",
+            SIZE_LARGE = "large";
+    private static String sizeCurrent;
+
 
     public SpeedOverlayService() {
     }
@@ -65,7 +71,7 @@ public class SpeedOverlayService extends Service {
         if(prefs.getBoolean("speedOverlay", true)) {
             overlayDpiIncrement = 25;
             centerTextSizeIncrement = 4;
-            if(prefs.getBoolean("overlayStatsText", true)) {
+            if(prefs.getBoolean("overlayText", true)) {
                 overlayStatsText = true;
                 overlayDpiBase = 110;
                 centerTextSizeBase = 14;
@@ -74,7 +80,7 @@ public class SpeedOverlayService extends Service {
             else {
                 overlayStatsText = false;
                 overlayDpiBase = 100;
-                centerTextSizeBase = 20;
+                centerTextSizeBase = 22;
                 holeRadius = 90;
             }
             wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
@@ -109,17 +115,21 @@ public class SpeedOverlayService extends Service {
             ViewGroup.LayoutParams pieParams = speedChart.getLayoutParams();
             int height, width;
             switch(prefs.getString("speedOverlaySize", "medium")) {
-                case "small":
+                case SIZE_SMALL:
                     height = width = dpiToPx(overlayDpiBase);
+                    sizeCurrent = SIZE_SMALL;
                     break;
-                case "medium":
+                case SIZE_MEDIUM:
                     height = width = dpiToPx(overlayDpiBase + overlayDpiIncrement);
+                    sizeCurrent = SIZE_MEDIUM;
                     break;
-                case "large":
+                case SIZE_LARGE:
                     height = width = dpiToPx(overlayDpiBase + 2*overlayDpiIncrement);
+                    sizeCurrent = SIZE_LARGE;
                     break;
                 default:
                     height = width = dpiToPx(overlayDpiBase + overlayDpiIncrement);
+                    sizeCurrent = SIZE_MEDIUM;
                     break;
             }
             pieParams.height = height;
@@ -383,14 +393,14 @@ public class SpeedOverlayService extends Service {
                 speedChart.setHoleColor(getResources().getColor(R.color.whiteTransparent));
                 speedChart.setCenterTextColor(Color.BLACK);
             }
-            switch(prefs.getString("speedOverlaySize", "medium")) {
-                case "small":
+            switch(sizeCurrent) {
+                case SIZE_SMALL:
                     speedChart.setCenterTextSize(centerTextSizeBase);
                     break;
-                case "medium":
+                case SIZE_MEDIUM:
                     speedChart.setCenterTextSize(centerTextSizeBase + centerTextSizeIncrement);
                     break;
-                case "large":
+                case SIZE_LARGE:
                     speedChart.setCenterTextSize(centerTextSizeBase + 2*centerTextSizeIncrement);
                     break;
                 default:
