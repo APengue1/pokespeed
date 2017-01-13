@@ -341,7 +341,7 @@ public class SpeedService extends Service implements LocationListener{
         String unit = getUnit();
         String distanceValid = String.format("%.2f", stats.getDistanceValid());
         String distanceCovered = String.format("%.2f", stats.getDistanceCovered());
-        return String.format("%s/%s %s valid", distanceValid, distanceCovered, unit);
+        return String.format("%s/%s %s under limit", distanceValid, distanceCovered, unit);
     }
 
     private String getUnit() {

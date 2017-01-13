@@ -224,7 +224,7 @@ public class StatsFragment extends Fragment {
             Legend pieLegend = pie.getLegend();
             pieLegend.setCustom(
                     new int[]{getResources().getColor(R.color.colorAccent), getResources().getColor(R.color.colorPrimary)},
-                    new String[]{"Valid", "Invalid"}
+                    new String[]{"Under Limit", "Over Limit"}
             );
             pieLegend.setPosition(Legend.LegendPosition.BELOW_CHART_RIGHT);
             pieLegend.setForm(Legend.LegendForm.CIRCLE);
