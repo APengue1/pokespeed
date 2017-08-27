@@ -1,4 +1,4 @@
-package com.example.angelo.PokeSpeed;
+package com.example.angelo.pspeed;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,27 +19,27 @@ public class MainActivity extends AppCompatActivity implements
         MainFragment.OnFragmentInteractionListener,
         StatsFragment.OnFragmentInteractionListener {
 
-    private final MainFragment mainFragment = MainFragment.newInstance();
-    private final StatsFragment statsFragment = StatsFragment.newInstance();
-    private final FragmentManager mFragment = getSupportFragmentManager();
+    static final String SHOW_STATS = "showStats";
     static PokeSpeedStats stats = null;
     static Boolean permissionGranted;
     static SharedPreferences prefs;
-    static final String SHOW_STATS = "showStats";
+    private final MainFragment mainFragment = MainFragment.newInstance();
+    private final StatsFragment statsFragment = StatsFragment.newInstance();
+    private final FragmentManager mFragment = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        if(!prefs.getBoolean("firstInit", false)) {
+        if (!prefs.getBoolean("firstInit", false)) {
             prefs.edit()
-                .putBoolean("vibrate", true)
-                .putBoolean("imperial", false)
-                .putBoolean("speedOverlay", true)
-                .putBoolean("firstInit", true)
-                .putBoolean("overlayText", true)
-                .putString("speedOverlaySize", "medium")
-                .commit();
+                    .putBoolean("vibrate", true)
+                    .putBoolean("imperial", false)
+                    .putBoolean("speedOverlay", true)
+                    .putBoolean("firstInit", true)
+                    .putBoolean("overlayText", true)
+                    .putString("speedOverlaySize", "medium")
+                    .commit();
         }
         PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, true);
         setContentView(R.layout.activity_main);
@@ -87,11 +87,9 @@ public class MainActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
-        else if(statsFragment.isAdded()) {
+        } else if (statsFragment.isAdded()) {
             showMain();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
@@ -118,16 +116,13 @@ public class MainActivity extends AppCompatActivity implements
             showMain();
         } else if (id == R.id.nav_stats) {
             showStats();
-        }  else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
-        }
-        else if(id == R.id.nav_share) {
+        } else if (id == R.id.nav_share) {
             shareApp();
-        }
-        else if(id == R.id.nav_rate) {
+        } else if (id == R.id.nav_rate) {
             giveRating();
-        }
-        else if (id == R.id.nav_feedback) {
+        } else if (id == R.id.nav_feedback) {
             sendFeedbackEmail();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -153,15 +148,14 @@ public class MainActivity extends AppCompatActivity implements
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "Speed for Pokemon GO: speed monitoring for Pokemon Go egg hatchers! "+
-                        "Hatch eggs efficiently by staying under the egg hatch speed limit! "  +
+                "Speed for Pokemon GO: speed monitoring for Pokemon Go egg hatchers! " +
+                        "Hatch eggs efficiently by staying under the egg hatch speed limit! " +
                         "Get it on Google Play: " +
-                        "https://play.google.com/store/apps/details?id=com.apengue.PokeSpeed");
+                        "https://play.google.com/store/apps/details?id=com.apengue.pspeed");
         shareIntent.setType("text/plain");
-        if(shareIntent.resolveActivity(getPackageManager()) != null) {
+        if (shareIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(shareIntent);
-        }
-        else {
+        } else {
             startActivity(
                     new Intent(
                             Intent.ACTION_VIEW,
@@ -177,17 +171,16 @@ public class MainActivity extends AppCompatActivity implements
         // to taken back to our application, we need to add following flags to intent.
         playStoreIntent.addFlags(
                 Intent.FLAG_ACTIVITY_NO_HISTORY |
-                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
-                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        if(playStoreIntent.resolveActivity(getPackageManager()) != null) {
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        if (playStoreIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(playStoreIntent);
-        }
-        else {
+        } else {
             startActivity(
-                new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("http://play.google.com/store/apps/details?id=" +
-                            getApplicationContext().getPackageName())));
+                    new Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" +
+                                    getApplicationContext().getPackageName())));
         }
     }
 
@@ -197,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.putExtra(Intent.EXTRA_EMAIL, address);
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.feedbackSubject));
-        if(emailIntent.resolveActivity(getPackageManager()) != null)
+        if (emailIntent.resolveActivity(getPackageManager()) != null)
             startActivity(emailIntent);
     }
 
@@ -209,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults.length > 0 && grantResults[0] != -1) {
+        if (grantResults.length > 0 && grantResults[0] != -1) {
             permissionGranted = true;
             mainFragment.startSpeedService();
         }

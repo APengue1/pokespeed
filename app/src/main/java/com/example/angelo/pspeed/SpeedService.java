@@ -1,4 +1,4 @@
-package com.example.angelo.PokeSpeed;
+package com.example.angelo.pspeed;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -22,34 +22,42 @@ import android.support.v4.content.LocalBroadcastManager;
 
 public class SpeedService extends Service implements LocationListener{
 
-    private SharedPreferences prefs;
+    static final String STOP_SERVICE_ACTION = "Stop Service Action";
+    static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
+    static final String PLAY_SERVICE_ACTION = "Play Service Action";
+    //private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
+    //private static final long[] VIBRATE_RED = new long[]{0, 35};
+    private static final int NOTIFY_ID = 1;
+    private static final String LOCATION_WAIT = "0.00";
+    private static final String TURN_ON_GPS = "Turn on gps";
+    private static final int MIN_ACCURACY = 15;
+    private static final long MIN_TIME_FAST = 0;
+    private static final long MIN_TIME_DEFAULT = 1000;
     static double SPEED_RED, SPEED_YELLOW, speedDefault;
-
+    static boolean serviceOn = false;
+    private static String lastSpeed;
+    private static boolean requestGpsFast, requestGpsDefault;
+    private final IBinder mBinder = new LocalBinder();
+    private SharedPreferences prefs;
     private NotificationCompat.Builder mBuilder;
     private LocationManager locationManager;
     private Vibrator vibrateService;
     private Location lastLocation;
     private Long lastTime;
     private NotificationManagerCompat notificationManager;
-    //private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
-    //private static final long[] VIBRATE_RED = new long[]{0, 35};
-    private static final int NOTIFY_ID = 1;
-    static final String STOP_SERVICE_ACTION = "Stop Service Action";
-    static final String PAUSE_SERVICE_ACTION = "Pause Service Action";
-    static final String PLAY_SERVICE_ACTION = "Play Service Action";
-    private final IBinder mBinder = new LocalBinder();
     private PokeSpeedStats stats;
-    private static String lastSpeed;
     private int lowSpeedCount;
-    static boolean serviceOn = false;
 
-    private static final String LOCATION_WAIT = "0.00";
-    private static final String TURN_ON_GPS = "Turn on gps";
-    private static final int MIN_ACCURACY = 15;
-    private static final long MIN_TIME_FAST = 0;
-    private static final long MIN_TIME_DEFAULT = 1000;
+    public static String getLastSpeed() {
+        return lastSpeed;
+    }
 
-    private static boolean requestGpsFast, requestGpsDefault;
+    private void setLastSpeed(String speed) {
+        lastSpeed = speed;
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
+        );
+    }
 
     @Override
     public void onCreate() {
@@ -117,12 +125,6 @@ public class SpeedService extends Service implements LocationListener{
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setVibrate(null)
                 .setContentIntent(resultPendingIntent);
-    }
-
-    public class LocalBinder extends Binder {
-        SpeedService getService() {
-            return SpeedService.this;
-        }
     }
 
     public PokeSpeedStats getStatsObj() {
@@ -219,10 +221,6 @@ public class SpeedService extends Service implements LocationListener{
         }
         catch(SecurityException e) {
         }
-    }
-
-    public static String getLastSpeed() {
-        return lastSpeed;
     }
 
     @Override
@@ -364,13 +362,6 @@ public class SpeedService extends Service implements LocationListener{
         super.onDestroy();
     }
 
-    private void setLastSpeed(String speed) {
-        lastSpeed = speed;
-        LocalBroadcastManager.getInstance(this).sendBroadcast(
-                new Intent("SpeedRefreshed").putExtra("SpeedRefreshed", true)
-        );
-    }
-
     private void sendServiceStatusChanged(boolean status) {
         serviceOn = status;
         LocalBroadcastManager.getInstance(this).sendBroadcast(
@@ -385,9 +376,16 @@ public class SpeedService extends Service implements LocationListener{
             startService(stop);
        // }
     }
+
     private void startOverlayService() {
         if(prefs.getBoolean("speedOverlay", true))
             startService(new Intent(this, SpeedOverlayService.class));
+    }
+
+    public class LocalBinder extends Binder {
+        SpeedService getService() {
+            return SpeedService.this;
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.angelo.PokeSpeed">
+    package="com.example.angelo.pspeed">
 
     <uses-feature android:name="android.hardware.location.gps" android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -14,12 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
-            android:name=".SpeedService"
+            android:name="com.example.angelo.pspeed.SpeedService"
             android:enabled="true"
             android:exported="true" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.angelo.pspeed.MainActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_main2"
             android:launchMode="singleInstance"
@@ -32,11 +32,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.example.angelo.pspeed.SettingsActivity"
             android:label="@string/title_activity_settings" />
 
         <service
-            android:name=".SpeedOverlayService"
+            android:name="com.example.angelo.pspeed.SpeedOverlayService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

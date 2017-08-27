@@ -1,4 +1,4 @@
-package com.example.angelo.PokeSpeed;
+package com.example.angelo.pspeed;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -44,6 +44,19 @@ public class StatsFragment extends Fragment {
     private SharedPreferences prefs;
     private View lastView;
     private Button btn_resetStats;
+    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("StatsRefreshed"))
+                showStats(lastView, false);
+            else if (intent.getAction().equals("ServiceStatusChanged")) {
+                if (intent.getBooleanExtra("status", true))
+                    ;//showResetButton(true);
+                else
+                    ;//showResetButton(false);
+            }
+        }
+    };
 
     public StatsFragment() {
 
@@ -59,6 +72,10 @@ public class StatsFragment extends Fragment {
     public static StatsFragment newInstance() {
         StatsFragment fragment = new StatsFragment();
         return fragment;
+    }
+
+    static boolean significantDifference(Float distanceCovered, float distanceValid) {
+        return distanceCovered - distanceValid > 0.001;
     }
 
     @Override
@@ -128,35 +145,6 @@ public class StatsFragment extends Fragment {
     public void onPause() {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessagereceiver);
         super.onPause();
-    }
-
-    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("StatsRefreshed"))
-                showStats(lastView, false);
-            else if(intent.getAction().equals("ServiceStatusChanged")) {
-                if(intent.getBooleanExtra("status", true))
-                    ;//showResetButton(true);
-                else
-                    ;//showResetButton(false);
-            }
-        }
-    };
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     private void showStats(View view, boolean reset) {
@@ -233,10 +221,6 @@ public class StatsFragment extends Fragment {
         }
     }
 
-    static boolean significantDifference(Float distanceCovered, float distanceValid) {
-        return distanceCovered - distanceValid > 0.001;
-    }
-
     private void refreshStats(final View recentView) {
         Timer speedTimer = new Timer();
         speedTimer.schedule(
@@ -272,5 +256,20 @@ public class StatsFragment extends Fragment {
             btn_resetStats.setVisibility(View.VISIBLE);
         else
             btn_resetStats.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 }

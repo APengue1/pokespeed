@@ -1,4 +1,4 @@
-package com.example.angelo.PokeSpeed;
+package com.example.angelo.pspeed;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -47,6 +47,34 @@ public class MainFragment extends Fragment {
     private SpeedService speedService;
 
     private OnFragmentInteractionListener mListener;
+    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getBooleanExtra("SpeedServiceStop", false))
+                refreshToggle();
+            if (intent.getBooleanExtra("SpeedRefreshed", false))
+                setMainSpeed();
+        }
+    };
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            speedService = ((SpeedService.LocalBinder) service).getService();
+            MainActivity.stats = speedService.getStatsObj();
+            mBound = true;
+            //refreshSpeed();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mBound = false;
+            speedService = null;
+        }
+    };
+
+    public MainFragment() {
+
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -59,9 +87,6 @@ public class MainFragment extends Fragment {
     public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         return fragment;
-    }
-    public MainFragment() {
-
     }
 
     @Override
@@ -128,32 +153,6 @@ public class MainFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessagereceiver);
         super.onPause();
     }
-
-    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getBooleanExtra("SpeedServiceStop", false))
-                refreshToggle();
-            if(intent.getBooleanExtra("SpeedRefreshed", false))
-                setMainSpeed();
-        }
-    };
-
-    private void setMainSpeed() {
-        if(isAdded()) {
-            String lastMessage = SpeedService.getLastSpeed();
-            if (lastMessage != null) {
-                //prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
-                try {
-                    Float.parseFloat(lastMessage);
-                    mainSpeed.setText(String.format("%s %s", lastMessage, unit));
-                } catch (NumberFormatException e) {
-                    mainSpeed.setText(lastMessage);
-                }
-            }
-        }
-    }
 //    private void refreshSpeed() {
 //        Timer speedTimer = new Timer();
 //        speedTimer.schedule(
@@ -179,6 +178,22 @@ public class MainFragment extends Fragment {
 //            0,
 //            1000);
 //    }
+
+    private void setMainSpeed() {
+        if (isAdded()) {
+            String lastMessage = SpeedService.getLastSpeed();
+            if (lastMessage != null) {
+                //prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String unit = prefs.getBoolean("imperial", false) ? "mi/h" : "km/h";
+                try {
+                    Float.parseFloat(lastMessage);
+                    mainSpeed.setText(String.format("%s %s", lastMessage, unit));
+                } catch (NumberFormatException e) {
+                    mainSpeed.setText(lastMessage);
+                }
+            }
+        }
+    }
 
     private void refreshToggle() {
         if(SpeedService.serviceOn)
@@ -227,21 +242,6 @@ public class MainFragment extends Fragment {
         super.onDetach();
         mListener = null;
         _unbindService();
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     public void stopSpeedService() {
@@ -320,19 +320,18 @@ public class MainFragment extends Fragment {
                 .show();
     }
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            speedService = ((SpeedService.LocalBinder) service).getService();
-            MainActivity.stats = speedService.getStatsObj();
-            mBound = true;
-            //refreshSpeed();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBound = false;
-            speedService = null;
-        }
-    };
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
 }

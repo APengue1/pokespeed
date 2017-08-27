@@ -1,4 +1,4 @@
-package com.example.angelo.PokeSpeed;
+package com.example.angelo.pspeed;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -32,6 +32,19 @@ import java.util.Locale;
 
 public class SpeedOverlayService extends Service {
 
+    private static final String
+            SIZE_SMALL = "small",
+            SIZE_MEDIUM = "medium",
+            SIZE_LARGE = "large";
+    static boolean servicePlay;
+    private static boolean overlayOn;
+    private static Long lastClick;
+    private static boolean overlayStatsText;
+    private static int overlayDpiBase, overlayDpiIncrement;
+    private static int centerTextSizeBase, centerTextSizeIncrement;
+    private static int holeRadius;
+    private static String sizeCurrent;
+    SharedPreferences prefs;
     private WindowManager wm;
     private PieChart speedChart;
     private View overlayView;
@@ -40,23 +53,14 @@ public class SpeedOverlayService extends Service {
     private PokeSpeedStats stats;
     private WindowManager.LayoutParams params;
     private WindowManager.LayoutParams paramsButtons;
-    SharedPreferences prefs;
-    private static boolean overlayOn;
-    static boolean servicePlay;
-    private static Long lastClick;
     private Locale locale;
-
-    private static boolean overlayStatsText;
-    private static int overlayDpiBase, overlayDpiIncrement;
-    private static int centerTextSizeBase, centerTextSizeIncrement;
-    private static int holeRadius;
-
-    private static final String
-            SIZE_SMALL = "small",
-            SIZE_MEDIUM = "medium",
-            SIZE_LARGE = "large";
-    private static String sizeCurrent;
-
+    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("SpeedRefreshed"))
+                showStats();
+        }
+    };
 
     public SpeedOverlayService() {
     }
@@ -256,7 +260,6 @@ public class SpeedOverlayService extends Service {
         return rectFirstView.intersect(rectSecondView);
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent.getAction() != null && intent.getAction().equals("stop")) {
@@ -279,15 +282,6 @@ public class SpeedOverlayService extends Service {
         }
         stopSelf();
     }
-
-
-    private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("SpeedRefreshed"))
-                showStats();
-        }
-    };
 
     @Override
     public void onDestroy() {
