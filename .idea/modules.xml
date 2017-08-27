@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android-test-speed.iml" filepath="$PROJECT_DIR$/android-test-speed.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pokespeed.iml" filepath="$PROJECT_DIR$/pokespeed.iml" />
     </modules>
   </component>
 </project>
