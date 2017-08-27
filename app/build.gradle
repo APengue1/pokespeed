@@ -7,8 +7,8 @@ android {
         applicationId 'com.apengue.pspeed'
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 219
-        versionName '2.1.9'
+        versionCode 220
+        versionName '2.1.91'
     }
     buildTypes {
         release {
@@ -27,4 +27,5 @@ dependencies {
     compile 'com.android.support:design:26.0.1'
     compile 'com.android.support:support-v4:26.0.1'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.0-beta1'
+    compile 'com.google.android.gms:play-services-ads:11.2.0'
 }

@@ -18,12 +18,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 
 /**
@@ -36,15 +42,16 @@ import android.widget.ToggleButton;
  *
  */
 public class MainFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
+    private static Long adLastShown = null;
     private SharedPreferences prefs;
-
     private TextView mainSpeed;
     private ToggleButton speedToggle;
     private boolean mBound = false;
     private SpeedService speedService;
+    private AdView mAdView;
+    private InterstitialAd mInterstitialAd;
+    private AdRequest.Builder adBuilder;
 
     private OnFragmentInteractionListener mListener;
     private BroadcastReceiver mMessagereceiver = new BroadcastReceiver() {
@@ -62,7 +69,6 @@ public class MainFragment extends Fragment {
             speedService = ((SpeedService.LocalBinder) service).getService();
             MainActivity.stats = speedService.getStatsObj();
             mBound = true;
-            //refreshSpeed();
         }
 
         @Override
@@ -83,7 +89,6 @@ public class MainFragment extends Fragment {
      *
      * @return A new instance of fragment MainFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static MainFragment newInstance() {
         MainFragment fragment = new MainFragment();
         return fragment;
@@ -93,6 +98,18 @@ public class MainFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         prefs = MainActivity.prefs;
         super.onCreate(savedInstanceState);
+
+        adBuilder = new AdRequest.Builder();
+        mInterstitialAd = new InterstitialAd(getContext().getApplicationContext());
+        mInterstitialAd.setAdUnitId("ca-app-pub-8562523082493312/3284159929");
+        mInterstitialAd.loadAd(adBuilder.build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                AdRequest adRequest = adBuilder.build();
+                mInterstitialAd.loadAd(adRequest);
+            }
+        });
     }
 
     @Override
@@ -101,6 +118,9 @@ public class MainFragment extends Fragment {
 
         final View view = inflater.inflate(
                 R.layout.fragment_main, container, false);
+
+        mAdView = (AdView) view.findViewById(R.id.adView);
+        mAdView.loadAd(adBuilder.build());
 
         mainSpeed = (TextView)view.findViewById(R.id.mainSpeed);
 
@@ -111,6 +131,7 @@ public class MainFragment extends Fragment {
                 if(speedToggle.isChecked()) {
                     startSpeedService();
                     toggleOn();
+                    showAd();
                 }
                 else {
                     mainSpeed.setText("");
@@ -153,31 +174,6 @@ public class MainFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessagereceiver);
         super.onPause();
     }
-//    private void refreshSpeed() {
-//        Timer speedTimer = new Timer();
-//        speedTimer.schedule(
-//            new TimerTask() {
-//                @Override
-//                public void run() {
-//                if(mBound)
-//                    getActivity().runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mainSpeed.setText(speedService.getLastSpeed());
-//                            if(prefs.getBoolean("imperial", false))
-//                                speedUnit.setText("mph");
-//                            else
-//                                speedUnit.setText("kmh");
-//                        }
-//                    });
-//                else
-//                    cancel();
-//
-//                }
-//            },
-//            0,
-//            1000);
-//    }
 
     private void setMainSpeed() {
         if (isAdded()) {
@@ -209,6 +205,17 @@ public class MainFragment extends Fragment {
         }
     }
 
+    private void showAd() {
+        if (mInterstitialAd.isLoaded()) {
+            if (adLastShown == null || System.currentTimeMillis() - adLastShown > 5 * 60 * 1000) {
+                adLastShown = System.currentTimeMillis();
+                mInterstitialAd.show();
+            }
+        } else {
+            Log.d("MAIN_FRAGMENT", "The interstitial wasn't loaded yet.");
+        }
+    }
+
     private void toggleOff() {
         if(isAdded()) {
             speedToggle.setChecked(false);
@@ -216,7 +223,6 @@ public class MainFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -331,7 +337,6 @@ public class MainFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.google.android.gms.ads.MobileAds;
+
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         MainFragment.OnFragmentInteractionListener,
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-8562523082493312~4302384663");
         prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (!prefs.getBoolean("firstInit", false)) {
             prefs.edit()
