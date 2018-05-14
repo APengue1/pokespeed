@@ -1,5 +1,8 @@
 package com.example.angelo.pspeed;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -11,12 +14,13 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
 
@@ -27,7 +31,8 @@ public class SpeedService extends Service implements LocationListener{
     static final String PLAY_SERVICE_ACTION = "Play Service Action";
     //private static final long [] VIBRATE_YELLOW = new long[]{100, 100};
     //private static final long[] VIBRATE_RED = new long[]{0, 35};
-    private static final int NOTIFY_ID = 1;
+    private static final Integer NOTIFY_CHANNEL_ID = 1;
+    private static final String NOTIFY_CHANNEL_NAME = "SpeedService";
     private static final String LOCATION_WAIT = "0.00";
     private static final String TURN_ON_GPS = "Turn on gps";
     private static final int MIN_ACCURACY = 15;
@@ -44,7 +49,7 @@ public class SpeedService extends Service implements LocationListener{
     private Vibrator vibrateService;
     private Location lastLocation;
     private Long lastTime;
-    private NotificationManagerCompat notificationManager;
+    private NotificationManager notificationManager;
     private PokeSpeedStats stats;
     private int lowSpeedCount;
 
@@ -68,7 +73,7 @@ public class SpeedService extends Service implements LocationListener{
         SPEED_YELLOW = SPEED_RED - 1.5;
         stats =  new PokeSpeedStats(prefs);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        notificationManager = NotificationManagerCompat.from(this);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         lastSpeed = "0.00";
         lowSpeedCount = 0;
         requestGpsFast = false;
@@ -118,7 +123,7 @@ public class SpeedService extends Service implements LocationListener{
                 resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         setLastSpeed(LOCATION_WAIT);
-        return new NotificationCompat.Builder(this)
+        return new NotificationCompat.Builder(this, SpeedService.NOTIFY_CHANNEL_ID.toString())
                 .setSmallIcon(R.drawable.ic_pokespeed_notification)
                 .setContentTitle("GO Speed")
                 .addAction(R.drawable.ic_clear_black_24dp, "Stop", resultStopIntent)
@@ -157,7 +162,7 @@ public class SpeedService extends Service implements LocationListener{
                 mBuilder.setContentText("Paused. " + distanceSummmary());
                 addPlayAction(mBuilder);
                 setLastSpeed("Paused");
-                notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
+                notificationManager.notify(SpeedService.NOTIFY_CHANNEL_ID, mBuilder.build());
                 SpeedOverlayService.servicePlay = !SpeedOverlayService.servicePlay;
             }
             else if(intent.getAction().equals(SpeedService.PLAY_SERVICE_ACTION)) {
@@ -182,8 +187,21 @@ public class SpeedService extends Service implements LocationListener{
     }
 
     private void initNotification() {
-        startForeground(SpeedService.NOTIFY_ID, mBuilder.build());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel();
+        }
+        startForeground(SpeedService.NOTIFY_CHANNEL_ID, mBuilder.build());
         setSpeed(0F);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private void createNotificationChannel() {
+        NotificationChannel chan = new NotificationChannel(
+                SpeedService.NOTIFY_CHANNEL_ID.toString(),
+                SpeedService.NOTIFY_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT);
+        chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        notificationManager.createNotificationChannel(chan);
     }
 
     private void requestLocation(long minTime) {
@@ -289,15 +307,6 @@ public class SpeedService extends Service implements LocationListener{
         }
     }
 
-//    private void setInaccurate() {
-//        mBuilder.setVibrate(null);
-//        mBuilder.setContentTitle("GO Speed");
-//        mBuilder.setContentText(LOCATION_WAIT);
-//        mBuilder.setColor(Color.TRANSPARENT);
-//        notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
-//        setLastSpeed(LOCATION_WAIT);
-//    }
-
     private void setSpeed(Float speed) {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean bVibrate = prefs.getBoolean("vibrate", true);
@@ -331,7 +340,7 @@ public class SpeedService extends Service implements LocationListener{
         mBuilder.setContentTitle(String.format("GO speed is %.2f %s", fSpeed, unit + "/h"));
         mBuilder.setContentText(String.format("%s %s", contentText, distanceSummmary()));
         mBuilder.setColor(argb);
-        notificationManager.notify(SpeedService.NOTIFY_ID, mBuilder.build());
+        notificationManager.notify(SpeedService.NOTIFY_CHANNEL_ID, mBuilder.build());
         setLastSpeed(String.format("%.2f", fSpeed));
     }
 
