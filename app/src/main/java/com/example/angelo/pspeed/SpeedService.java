@@ -199,7 +199,7 @@ public class SpeedService extends Service implements LocationListener{
         NotificationChannel chan = new NotificationChannel(
                 SpeedService.NOTIFY_CHANNEL_ID.toString(),
                 SpeedService.NOTIFY_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationManager.IMPORTANCE_LOW);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(chan);
     }
